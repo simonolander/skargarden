@@ -394,8 +394,11 @@ renderBoard { maxWidth, maxHeight } board =
           let
             renderColumnHeader index columnRegions = 
               let 
+                currentNumberOfUnknowns =
+                  Util.countIf Region.isUnknown columnRegions
+
                 hasUnknowns = 
-                  any Region.isUnknown columnRegions
+                  currentNumberOfUnknowns > 0
 
                 Tuple currentNumberOfBoats soughtNumberOfBoats = 
                   Array.index progress.columnProgress index
@@ -414,6 +417,9 @@ renderBoard { maxWidth, maxHeight } board =
 
                 tooMany = 
                   currentNumberOfBoats > soughtNumberOfBoats
+
+                tooFew = 
+                  currentNumberOfUnknowns + currentNumberOfBoats < soughtNumberOfBoats
               in 
                 HH.div 
                   [ classes 
@@ -426,6 +432,8 @@ renderBoard { maxWidth, maxHeight } board =
                               Just "can-fill" 
                             else if tooMany then 
                               Just "too-many" 
+                            else if tooFew then 
+                              Just "too-few" 
                             else 
                               Nothing
                           ]
@@ -460,8 +468,11 @@ renderBoard { maxWidth, maxHeight } board =
           let
             rowHeader = 
               let 
+                currentNumberOfUnknowns = 
+                  Util.countIf Region.isUnknown rowRegions
+
                 hasUnknowns = 
-                  any Region.isUnknown rowRegions
+                  currentNumberOfUnknowns > 0
 
                 Tuple currentNumberOfBoats soughtNumberOfBoats = 
                   Array.index progress.rowProgress index
@@ -480,6 +491,9 @@ renderBoard { maxWidth, maxHeight } board =
 
                 tooMany = 
                   currentNumberOfBoats > soughtNumberOfBoats
+
+                tooFew = 
+                  currentNumberOfBoats + currentNumberOfUnknowns < soughtNumberOfBoats
               in 
                 HH.div 
                   [ classes 
@@ -491,6 +505,8 @@ renderBoard { maxWidth, maxHeight } board =
                             else if canFill then 
                               Just "can-fill"
                             else if tooMany then 
+                              Just "too-many"  
+                            else if tooFew then 
                               Just "too-many"  
                             else 
                               Nothing
