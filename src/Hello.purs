@@ -409,6 +409,9 @@ renderBoard { maxWidth, maxHeight } board =
                   hasUnknowns 
                     && Board.canFillLine false line board 
                     || Board.canFillLine true line board
+
+                tooMany = 
+                  currentNumberOfBoats > soughtNumberOfBoats
               in 
                 HH.div 
                   [ classes 
@@ -419,6 +422,8 @@ renderBoard { maxWidth, maxHeight } board =
                               Just "finished" 
                             else if canFill then 
                               Just "can-fill" 
+                            else if tooMany then 
+                              Just "too-many" 
                             else 
                               Nothing
                           ]
@@ -470,6 +475,9 @@ renderBoard { maxWidth, maxHeight } board =
                   hasUnknowns 
                     && Board.canFillLine false line board 
                     || Board.canFillLine true line board
+
+                tooMany = 
+                  currentNumberOfBoats > soughtNumberOfBoats
               in 
                 HH.div 
                   [ classes 
@@ -479,7 +487,9 @@ renderBoard { maxWidth, maxHeight } board =
                           , if finished then 
                               Just "finished" 
                             else if canFill then 
-                              Just "can-fill" 
+                              Just "can-fill"
+                            else if tooMany then 
+                              Just "too-many"  
                             else 
                               Nothing
                           ]

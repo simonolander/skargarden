@@ -273,8 +273,18 @@ getProgress board =
                                         (Map.lookup key boatSizes # fromMaybe 0)
             in 
                 bothSizes
+
+        unknownRegions = 
+            History.current board.regions
+                # Matrix.toIndexedArray
+                # map Tuple.snd
+                # Util.countIf Region.isUnknown
     in 
-        { rowProgress, columnProgress, boatProgress }
+        { rowProgress
+        , columnProgress
+        , boatProgress
+        , unknownRegions
+        }
 
 rotateRegion :: Int -> Int -> Board -> Board
 rotateRegion rowIndex columnIndex board =
