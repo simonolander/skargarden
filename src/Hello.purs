@@ -255,7 +255,7 @@ render state =
                   pure unit
                 else do 
                   marginLeft $ px spacing
-                  width $ px 100.0
+                  width $ pct 100.0
             ]
 
     boardWidth =
