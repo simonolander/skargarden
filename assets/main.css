@@ -1,0 +1,78 @@
+body {
+    margin: 0px;
+    font-family: monospace;
+    user-select: none;
+    background-color: #e9e9e9;
+}
+
+.region {
+    cursor: pointer;
+    border-right: thin solid whitesmoke;
+    border-top: thin solid whitesmoke;
+}
+
+.region.disabled {
+    cursor: not-allowed;
+    content: \00A0;
+}
+
+.water {
+    background-color: hsl(239, 57%, 70%);
+}
+
+.water:hover:not(.disabled) {
+    background-color: hsl(239, 90%, 70%);
+}
+
+.boat {
+    background-color: hsl(34, 57%, 70%);
+}
+
+.boat:hover:not(.disabled) {
+    background-color: hsl(34, 90%, 70%);
+}
+
+.unknown {
+    background-color: hsl(0, 0%, 100%);
+}
+
+.unknown:hover:not(.disabled) {
+    background-color: hsl(0, 0%, 80%);
+}
+
+.header {
+    font-size: x-large;
+    text-align: center;
+    background-color: whitesmoke;
+}
+
+.header:hover {
+    cursor: pointer;
+    background-color: hsl(0, 0%, 80%);
+}
+
+.boat-legend {
+    border: 2px solid whitesmoke;
+    border-radius: 5px;
+}
+
+.small-boat {
+    background-color: white;
+}
+
+.small-boat.correct {
+    background-color:  hsl(34, 57%, 75%);
+}
+
+.small-boat.too-many {
+    background-color: hsl(0, 57%, 75%);
+}
+
+button {
+    cursor: pointer;
+    background-color: whitesmoke;
+}
+
+button:hover {
+    background-color: hsl(0, 0%, 80%);
+}
