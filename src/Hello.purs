@@ -7,6 +7,8 @@ import Board as Board
 import CSS (alignItems, alignSelf, backgroundColor, black, blanchedalmond, border, borderBottom, borderLeft, borderRadius, borderRight, borderTop, burlywood, color, column, display, dotted, flex, flexDirection, fontFamily, fontSize, height, hover, justifyContent, lineHeight, margin, marginBottom, marginLeft, marginTop, maxHeight, maxWidth, minHeight, minWidth, padding, paddingBottom, paddingLeft, paddingRight, paddingTop, pct, pt, px, rgb, ridge, row, solid, star, white, whitesmoke, width, with, (?))
 import CSS as Grid
 import CSS.Common (center)
+import CSS.Flexbox as Flexbox
+import CSS.Overflow (overflow, overflowY, scroll)
 import CSS.TextAlign (textAlign)
 import CSS.TextAlign as TextAlign
 import Data.Array (any)
@@ -104,6 +106,19 @@ render state =
     solved = 
       Progress.isSolved progress
 
+    maxBoardWidth =
+      (Int.toNumber state.viewPort.width) - 2.0 * spacing
+
+    maxBoardHeight =
+      (Int.toNumber state.viewPort.height) - 2.0 * spacing
+
+    { boardView, boardWidth, boardHeight } =
+      renderBoard
+        { maxWidth : maxBoardWidth
+        , maxHeight : maxBoardHeight
+        }
+        state.board
+
     renderBoatLegend :: forall w. Board -> HTML w Action
     renderBoatLegend board =
       let 
@@ -168,7 +183,7 @@ render state =
                 , CSS.style do 
                     marginLeft $ px $ spacing * 2.0
                     marginLeft $ px $ spacing / 2.0
-                    lineHeight $ px minSize
+                    lineHeight $ px $ Int.toNumber size.height * minSize
                 ]
                 [ HH.span 
                     []
@@ -200,7 +215,17 @@ render state =
                   paddingLeft $ px $ spacing / 2.0
                   paddingTop $ px $ spacing / 2.0
                   paddingRight $ px $ spacing / 2.0
+                  if landscape then do 
+                    overflowY scroll
+                    pure unit
+                  else do 
+                    maxHeight $ px $ Int.toNumber state.viewPort.height - spacing * 3.0 - boardHeight
+                    overflowY scroll
+                    marginTop $ px $ spacing
               ]
+
+    boatLegentView = 
+      renderBoatLegend state.board
 
     buttons =
       let 
@@ -210,13 +235,12 @@ render state =
             padding (px 10.0) (px 10.0) (px 10.0) (px 10.0)
             fontSize $ px 18.0
             justifyContent center
-            marginBottom $ px spacing
+            marginTop $ px spacing
             borderRadius (px 5.0) (px 5.0) (px 5.0) (px 5.0)
             if landscape then do 
               marginTop $ px spacing
             else do 
               width $ pct 100.0
-
 
         newGameButton = 
           HH.button 
@@ -255,24 +279,8 @@ render state =
                   pure unit
                 else do 
                   marginLeft $ px spacing
-                  width $ pct 100.0
+                  Flexbox.flex 1 1 (pct 0.0)
             ]
-
-    boardWidth =
-      (Int.toNumber state.viewPort.width) - 2.0 * spacing
-
-    boardHeight =
-      (Int.toNumber state.viewPort.height) - 2.0 * spacing
-
-    boardView =
-      renderBoard
-        { maxWidth : boardWidth
-        , maxHeight : boardHeight
-        }
-        state.board
-
-    boatLegentView = 
-      renderBoatLegend state.board
   in
     HH.div
       [ CSS.style $ do 
@@ -298,15 +306,17 @@ render state =
                   if landscape then do 
                     flexDirection column
                     marginLeft (px spacing)
+                    overflowY scroll
+                    maxHeight $ px boardHeight
                   else do 
                     flexDirection row
-                    marginTop (px spacing)
+                    pure unit
               ]
               [ boatLegentView, buttons ]
           ]
       ]
 
-renderBoard :: forall w. { maxWidth :: Number, maxHeight :: Number } -> Board -> HTML w Action
+renderBoard :: forall w. { maxHeight :: Number, maxWidth :: Number } -> Board -> { boardHeight :: Number, boardView :: HTML w Action, boardWidth :: Number }
 renderBoard { maxWidth, maxHeight } board =
   let
     minCellSize = 20.0
@@ -390,7 +400,10 @@ renderBoard { maxWidth, maxHeight } board =
                     # fromMaybe (Tuple 0 0)
                 
                 line =
-                  Column index 
+                  Column index
+
+                finished = 
+                  not hasUnknowns && currentNumberOfBoats == soughtNumberOfBoats
 
                 canFill = 
                   hasUnknowns 
@@ -400,8 +413,14 @@ renderBoard { maxWidth, maxHeight } board =
                 HH.div 
                   [ classes 
                       $ map ClassName
-                          [ "header"
-                          , if canFill then "can-fill" else ""
+                      $ Array.catMaybes
+                          [ Just "header"
+                          , if finished then 
+                              Just "finished" 
+                            else if canFill then 
+                              Just "can-fill" 
+                            else 
+                              Nothing
                           ]
                   , CSS.style $ do
                       width $ units 1.0
@@ -444,16 +463,25 @@ renderBoard { maxWidth, maxHeight } board =
                 line =
                   Row index 
 
+                finished = 
+                  not hasUnknowns && currentNumberOfBoats == soughtNumberOfBoats
+
                 canFill = 
                   hasUnknowns 
                     && Board.canFillLine false line board 
                     || Board.canFillLine true line board
               in 
                 HH.div 
-                  [ classes
+                  [ classes 
                       $ map ClassName
-                          [ "header"
-                          , if canFill then "can-fill" else ""
+                      $ Array.catMaybes
+                          [ Just "header"
+                          , if finished then 
+                              Just "finished" 
+                            else if canFill then 
+                              Just "can-fill" 
+                            else 
+                              Nothing
                           ]
                   , CSS.style $ do
                       width $ units headerSizeInUnits
@@ -519,14 +547,18 @@ renderBoard { maxWidth, maxHeight } board =
         Matrix.toRows regions
           # mapWithIndex renderRow
   in
-  HH.div
-    [ CSS.style $ do
-        width $ px widthInPx
-        height $ px heightInPx
-        display flex
-        flexDirection column
-    ]
-    $ Array.cons columnHeadersRow rows
+  { boardView : 
+      HH.div
+        [ CSS.style $ do
+            width $ px widthInPx
+            height $ px heightInPx
+            display flex
+            flexDirection column
+        ]
+        $ Array.cons columnHeadersRow rows
+  , boardWidth : widthInPx
+  , boardHeight : heightInPx
+  }
 
 
 handleAction :: Action → H.HalogenM State Action NoChildSlots Message Aff Unit
