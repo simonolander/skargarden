@@ -338,6 +338,8 @@ renderBoard { maxWidth, maxHeight } board =
 
     progress = Board.getProgress board
 
+    solved = Progress.isSolved progress
+
     widthByHeight =
       let
         widthInUnits = headerSizeInUnits + Int.toNumber numberOfColumns
@@ -534,6 +536,8 @@ renderBoard { maxWidth, maxHeight } board =
                   , HE.onClick 
                       $ const 
                       $ if disabled then 
+                          Nothing
+                        else if solved then 
                           Nothing
                         else 
                           Just $ Toggle index c
