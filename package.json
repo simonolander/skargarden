@@ -4,7 +4,7 @@
   "description": "A battleships game in written in purescript",
   "scripts": {
     "postinstall": "spago install",
-    "clean": "rm -rf node_modules output .spago dist *.lock .cache",
+    "clean": "rm -rf node_modules output .spago dist .cache",
     "build": "spago build",
     "watch": "spago build --watch",
     "bundle": "spago bundle-app --main Main --to dist/app.js && parcel build assets/index.html assets/main.css",
