@@ -7,12 +7,6 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Install command line tools
-      run: |
-        sudo apt-get update
-        which stack
-        export PATH="/home/runner/.local/bin:${PATH}"
-        curl -sSL https://get.haskellstack.org/ | sh -s - -f
     - uses: borales/actions-yarn@v2.1.0
       with:
         cmd: install # will run `yarn install` command
