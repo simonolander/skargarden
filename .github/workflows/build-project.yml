@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-16.04
     steps:
     - uses: actions/checkout@v1
     - uses: borales/actions-yarn@v2.1.0
