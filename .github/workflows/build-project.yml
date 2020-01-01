@@ -11,6 +11,7 @@ jobs:
       run: |
         sudo apt-get update
         which stack
+        export PATH="/home/runner/.local/bin:${PATH}"
         curl -sSL https://get.haskellstack.org/ | sh -s - -f
     - uses: borales/actions-yarn@v2.1.0
       with:
