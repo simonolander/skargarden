@@ -7,7 +7,7 @@
     "clean": "rm -rf node_modules output .spago dist .cache",
     "build": "spago build",
     "watch": "spago build --watch",
-    "bundle": "spago bundle-app --main Main --to dist/app.js && parcel build assets/index.html assets/main.css",
+    "bundle": "spago bundle-app --main Main --to bundle/app.js && parcel build assets/index.html assets/main.css",
     "serve": "yarn bundle && http-server dist",
     "test": "spago test"
   },
