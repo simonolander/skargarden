@@ -4947,7 +4947,7 @@ source-map@^0.5.0, source-map@^0.5.6:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.7.tgz#8a039d2d1021d22d1ea14c80d8ea468ba2ef3fcc"
   integrity sha1-igOdLRAh0i0eoUyA2OpGi6LvP8w=
 
-spago@^0.12.3:
+spago@^0.13.0:
   version "0.13.0"
   resolved "https://registry.yarnpkg.com/spago/-/spago-0.13.0.tgz#5705b1cddf2f81c190dc1cc0cd12aeb029255fe1"
   integrity sha512-+kGqTXdcQbmgNb5mfcC+gPgsfNSYIf8JVo0WFa4A8cf1TQQ/xnpbLkI794uudR1cNg5Q/SaUQMBWB4M3VpZu1A==
