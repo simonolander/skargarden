@@ -10,7 +10,8 @@ jobs:
     - name: Install command line tools
       run: |
         sudo apt-get update
-        curl -sSL https://get.haskellstack.org/ | sh
+        which stack
+        curl -sSL https://get.haskellstack.org/ | sh -s - -f
     - uses: borales/actions-yarn@v2.1.0
       with:
         cmd: install # will run `yarn install` command
