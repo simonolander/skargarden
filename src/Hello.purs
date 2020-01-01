@@ -4,9 +4,9 @@ import Prelude
 
 import Board (Board, rotateRegion)
 import Board as Board
-import CSS (alignItems, alignSelf, backgroundColor, black, blanchedalmond, border, borderBottom, borderLeft, borderRadius, borderRight, borderTop, burlywood, color, column, display, dotted, flex, flexDirection, fontFamily, fontSize, height, hover, justifyContent, lineHeight, margin, marginBottom, marginLeft, marginTop, maxHeight, maxWidth, minHeight, minWidth, padding, paddingBottom, paddingLeft, paddingRight, paddingTop, pct, pt, px, rgb, ridge, row, solid, star, white, whitesmoke, width, with, (?))
+import CSS (TextDecoration(..), absolute, alignItems, alignSelf, backgroundColor, black, blanchedalmond, border, borderBottom, borderLeft, borderRadius, borderRight, borderTop, bottom, burlywood, color, column, display, dotted, flex, flexDirection, fontFamily, fontSize, height, hover, justifyContent, lineHeight, margin, marginBottom, marginLeft, marginTop, maxHeight, maxWidth, minHeight, minWidth, noneTextDecoration, padding, paddingBottom, paddingLeft, paddingRight, paddingTop, pct, position, pt, px, rgb, ridge, right, row, solid, star, textDecoration, white, whitesmoke, width, with, zIndex, (?))
 import CSS as Grid
-import CSS.Common (center)
+import CSS.Common (center, none)
 import CSS.Flexbox as Flexbox
 import CSS.Overflow (overflow, overflowY, scroll)
 import CSS.TextAlign (textAlign)
@@ -44,6 +44,7 @@ import Rectangle as Rectangle
 import Region (Region(..))
 import Region as Region
 import Util as Util
+import Version as Version
 import ViewPort (ViewPort)
 import Web.Event.Event (Event, EventType(..))
 import Web.HTML (History, Window)
@@ -281,6 +282,19 @@ render state =
                   marginLeft $ px spacing
                   Flexbox.flex 1 1 (pct 0.0)
             ]
+
+    versionView = 
+      HH.a
+        [ class_ $ ClassName "version"
+        , CSS.style $ do 
+            position absolute
+            right $ px 0.0
+            bottom $ px 0.0
+            padding (px spacing) (px spacing) (px spacing) (px spacing)
+        , HP.href "https://github.com/simonolander/skargarden"
+        ]
+        [ HH.text Version.version
+        ]
   in
     HH.div
       [ CSS.style $ do 
@@ -290,7 +304,8 @@ render state =
           alignItems center
           height $ px $ Int.toNumber state.viewPort.height - spacing * 2.0
       ]
-      [ HH.div 
+      [ versionView
+      , HH.div 
           [ CSS.style $ do 
               display flex
               flexDirection $

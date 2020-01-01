@@ -89,3 +89,12 @@ button {
 button:hover {
     background-color: hsl(0, 0%, 80%);
 }
+
+.version {
+    color: #cecece;
+    text-decoration: none;
+}
+.version:hover {
+    text-decoration: underline;
+    color: black;
+}
