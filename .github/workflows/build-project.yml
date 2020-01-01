@@ -9,9 +9,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Install command line tools
       run: |
-        which brew
-        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew install yarn
+        sudo brew install yarn
     - name: Yarn install
       run : |
         yarn install
