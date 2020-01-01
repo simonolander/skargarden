@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: simonolander/skargarden-docker-image
     steps:
     - uses: actions/checkout@v1
     - name: Install command line tools
