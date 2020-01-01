@@ -10,3 +10,4 @@
 /.cache
 /.spago
 /dist
+/bundle
