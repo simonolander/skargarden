@@ -1,0 +1,15 @@
+name: Upload bundle to S3
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - uses: /build-project
+    - run: yarn bundle
