@@ -9,7 +9,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Install command line tools
       run: |
-        brew install yarn
+        which yarn
     - name: Yarn install
       run : |
         yarn install
