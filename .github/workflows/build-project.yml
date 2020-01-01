@@ -4,12 +4,7 @@ on: [push]
 
 jobs:
   build:
-    runs-on: simonolander/skargarden-docker-image
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Install command line tools
-      run: |
-        which yarn
-    - name: Yarn install
-      run : |
-        yarn install
+    - uses: simonolander/skargarden-docker-image
