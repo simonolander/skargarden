@@ -12,18 +12,15 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@master
-    
     # - name: Set version in Version.purs
       # run: sed -i "s/develop/${{ github.ref }}/g" src/Version.purs
       # run: cat src/Version.purs
-
     - name: Build bundle
     - uses: actions/setup-node@v1
       with:
         node-version: '12.x'
     - run: yarn install
     - run: yarn bundle
-    
     # - name: Create Release
     #   id: create_release
     #   uses: actions/create-release@v1
