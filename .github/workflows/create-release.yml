@@ -55,4 +55,3 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: eu-west-3 # Europe (Paris)
         SOURCE_DIR: dist
-        DEST_DIR: /
