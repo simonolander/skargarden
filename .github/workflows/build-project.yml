@@ -1,6 +1,6 @@
 name: Build project
 
-# on: [push]
+on: [push]
 
 jobs:
   build:
