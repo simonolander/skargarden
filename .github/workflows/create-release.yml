@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@master
+    - uses: actions/checkout@master
     # - name: Set version in Version.purs
       # run: sed -i "s/develop/${{ github.ref }}/g" src/Version.purs
       # run: cat src/Version.purs
