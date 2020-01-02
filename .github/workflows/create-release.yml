@@ -1,8 +1,7 @@
 on:
   push:
-    # Sequence of patterns matched against refs/tags
     tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+      - 'v*' # e.g. v1.0, v20.15.10
 
 name: Create Release
 
@@ -13,6 +12,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@master
+      
+      - name: Set version in Version.purs
+        run: sed -i "s/develop/${{ github.ref }}/g" src/Version.purs
+        run: cat src/Version.purs
+
+      - name: Build bundle
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - run: yarn install
+      - run: yarn bundle
+      
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -27,3 +38,7 @@ jobs:
             - Second Change
           draft: false
           prerelease: false
+      
+      - name: Upload bundle
+      - uses: jakejarvis/s3-sync-action@v0.5.0
+      - run: echo Not implemented
