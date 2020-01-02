@@ -38,7 +38,3 @@ jobs:
             - Second Change
           draft: false
           prerelease: false
-      
-      - name: Upload bundle
-      - uses: jakejarvis/s3-sync-action@v0.5.0
-      - run: echo Not implemented
