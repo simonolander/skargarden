@@ -13,9 +13,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@master
       
-      - name: Set version in Version.purs
-        run: sed -i "s/develop/${{ github.ref }}/g" src/Version.purs
-        run: cat src/Version.purs
+      # - name: Set version in Version.purs
+        # run: sed -i "s/develop/${{ github.ref }}/g" src/Version.purs
+        # run: cat src/Version.purs
 
       - name: Build bundle
       - uses: actions/setup-node@v1
