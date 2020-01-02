@@ -10,7 +10,7 @@
     "bundle": "spago bundle-app --main Main --to bundle/app.js && parcel build --no-source-maps assets/index.html assets/main.css",
     "serve": "yarn bundle && http-server dist",
     "test": "spago test",
-    "patch": "git tag | sort -r | head -n1 | awk -F. '{$NF++; OFS=\".\"; print $0}' | xargs -I. git tag -a . -m \"New patch version: .\" && git push && git push --tags"
+    "patch": "git tag | sort -rV | head -n1 | awk -F. '{$NF++; OFS=\".\"; print $0}' | xargs -I. git tag -a . -m \"New patch version: .\" && git push && git push --tags"
   },
   "repository": {
     "type": "git",
