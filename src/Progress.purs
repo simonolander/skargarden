@@ -11,7 +11,7 @@ type Progress =
     { rowProgress :: Array (Tuple Int Int) 
     , columnProgress :: Array (Tuple Int Int) 
     , boatProgress :: Array (Tuple Size (Tuple Int Int))
-    , unknownRegions :: Int
+    , unknownTerrainTypes :: Int
     }
 
 isSolved :: Progress -> Boolean 
@@ -19,4 +19,4 @@ isSolved progress =
     all (Tuple.uncurry (==)) progress.rowProgress
         && all (Tuple.uncurry (==)) progress.columnProgress 
         && all (Tuple.uncurry (==)) (map Tuple.snd progress.boatProgress)
-        && progress.unknownRegions == 0
+        && progress.unknownTerrainTypes == 0

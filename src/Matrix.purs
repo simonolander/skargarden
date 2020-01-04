@@ -2,11 +2,15 @@ module Matrix where
 
 import Prelude
 
+import CSS (position)
 import Data.Array (all)
 import Data.Array as Array
-import Data.FunctorWithIndex (class FunctorWithIndex)
+import Data.FunctorWithIndex (class FunctorWithIndex, mapWithIndex)
+import Data.List (List(..), (:))
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Maybe as Maybe
+import Data.Set (Set)
+import Data.Set as Set
 import Data.Tuple (Tuple(..))
 import Data.Tuple as Tuple
 import Data.Unfoldable (replicateA)
@@ -240,3 +244,52 @@ findRectangles fn matrix =
     in 
         findRectangles' (Tuple [] (init numberOfRows numberOfColumns false)) (Tuple 0 0) 
             # Tuple.fst
+
+findTerrainTypes :: forall a. (a -> Boolean) -> Matrix a -> List (Set Position)
+findTerrainTypes fn matrix =
+    let
+        findTerrainType :: Set Position -> Set Position -> Set Position -> Set Position
+        findTerrainType includedPositions queue candidatePositions = 
+            case Set.findMin queue of 
+                Just position -> 
+                    let
+                        adjacentPositions = 
+                            flap [ west, north, east, south ] position
+                                # Array.filter (not <<< flip Set.member queue)
+                                # Array.filter (not <<< flip Set.member includedPositions)
+                                # Array.filter (flip Set.member candidatePositions)
+                                # Set.fromFoldable
+                        
+                        queue' = 
+                            Set.delete position queue
+                                # Set.union adjacentPositions
+
+                        includedPositions' = 
+                            Set.insert position includedPositions
+                    in
+                        findTerrainType includedPositions' queue' candidatePositions
+                Nothing -> 
+                    includedPositions
+
+        findTerrainTypesR :: Set Position -> List (Set Position)
+        findTerrainTypesR candidatePositions = 
+            case Set.findMin candidatePositions of 
+                Just candidatePosition -> 
+                    let 
+                        region = 
+                            findTerrainType Set.empty (Set.singleton candidatePosition) candidatePositions
+
+                        candidatePositions' = 
+                            Set.difference candidatePositions region
+                    in 
+                        region : findTerrainTypesR candidatePositions'
+
+                Nothing -> 
+                    Nil
+
+    in
+        toIndexedArray matrix
+            # Array.filter (Tuple.snd >>> fn)
+            # map Tuple.fst
+            # Set.fromFoldable
+            # findTerrainTypesR

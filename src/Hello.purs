@@ -2,7 +2,7 @@ module Hello where
 
 import Prelude
 
-import Board (Board, rotateRegion)
+import Board (Board, rotateTerrainType)
 import Board as Board
 import CSS (TextDecoration(..), absolute, alignItems, alignSelf, backgroundColor, black, blanchedalmond, border, borderBottom, borderLeft, borderRadius, borderRight, borderTop, bottom, burlywood, color, column, display, dotted, flex, flexDirection, fontFamily, fontSize, height, hover, justifyContent, lineHeight, margin, marginBottom, marginLeft, marginTop, maxHeight, maxWidth, minHeight, minWidth, noneTextDecoration, padding, paddingBottom, paddingLeft, paddingRight, paddingTop, pct, position, pt, px, rgb, ridge, right, row, solid, star, textDecoration, white, whitesmoke, width, with, zIndex, (?))
 import CSS as Grid
@@ -41,8 +41,8 @@ import Progress (Progress)
 import Progress as Progress
 import Rectangle (Rectangle)
 import Rectangle as Rectangle
-import Region (Region(..))
-import Region as Region
+import TerrainType (TerrainType(..))
+import TerrainType as TerrainType
 import Util as Util
 import Version as Version
 import ViewPort (ViewPort)
@@ -120,16 +120,16 @@ render state =
         }
         state.board
 
-    renderBoatLegend :: forall w. Board -> HTML w Action
-    renderBoatLegend board =
+    renderLandLegend :: forall w. Board -> HTML w Action
+    renderLandLegend board =
       let 
-        renderBoatRow (Tuple size (Tuple currentNumberOfBoats soughtNumberOfBoats)) = 
+        renderLandRow (Tuple size (Tuple currentNumberOfLands soughtNumberOfLands)) = 
           let 
             correct = 
-              currentNumberOfBoats == soughtNumberOfBoats
+              currentNumberOfLands == soughtNumberOfLands
 
             tooMany = 
-              currentNumberOfBoats > soughtNumberOfBoats
+              currentNumberOfLands > soughtNumberOfLands
 
             minSize = 
               20.0
@@ -188,13 +188,13 @@ render state =
                 ]
                 [ HH.span 
                     []
-                    [ HH.text $ show currentNumberOfBoats ]
+                    [ HH.text $ show currentNumberOfLands ]
                 , HH.span 
                     []
                     [ HH.text $ "/" ]
                 , HH.span 
                     []
-                    [ HH.text $ show soughtNumberOfBoats ]
+                    [ HH.text $ show soughtNumberOfLands ]
                 ]
           in
             HH.div
@@ -207,7 +207,7 @@ render state =
               [ boatView, countView ]
           
       in 
-        map renderBoatRow progress.boatProgress
+        map renderLandRow progress.boatProgress
           # HH.div
               [ class_ $ ClassName "boat-legend"
               , CSS.style $ do 
@@ -226,7 +226,7 @@ render state =
               ]
 
     boatLegentView = 
-      renderBoatLegend state.board
+      renderLandLegend state.board
 
     buttons =
       let 
@@ -407,15 +407,15 @@ renderBoard { maxWidth, maxHeight } board =
         
         columnHeaders = 
           let
-            renderColumnHeader index columnRegions = 
+            renderColumnHeader index columnTerrainTypes = 
               let 
                 currentNumberOfUnknowns =
-                  Util.countIf Region.isUnknown columnRegions
+                  Util.countIf TerrainType.isUnknown columnTerrainTypes
 
                 hasUnknowns = 
                   currentNumberOfUnknowns > 0
 
-                Tuple currentNumberOfBoats soughtNumberOfBoats = 
+                Tuple currentNumberOfLands soughtNumberOfLands = 
                   Array.index progress.columnProgress index
                     # fromMaybe (Tuple 0 0)
                 
@@ -423,7 +423,7 @@ renderBoard { maxWidth, maxHeight } board =
                   Column index
 
                 finished = 
-                  not hasUnknowns && currentNumberOfBoats == soughtNumberOfBoats
+                  not hasUnknowns && currentNumberOfLands == soughtNumberOfLands
 
                 canFill = 
                   hasUnknowns 
@@ -431,10 +431,10 @@ renderBoard { maxWidth, maxHeight } board =
                     || Board.canFillLine true line board
 
                 tooMany = 
-                  currentNumberOfBoats > soughtNumberOfBoats
+                  currentNumberOfLands > soughtNumberOfLands
 
                 tooFew = 
-                  currentNumberOfUnknowns + currentNumberOfBoats < soughtNumberOfBoats
+                  currentNumberOfUnknowns + currentNumberOfLands < soughtNumberOfLands
               in 
                 HH.div 
                   [ classes 
@@ -463,7 +463,7 @@ renderBoard { maxWidth, maxHeight } board =
                         else 
                           Nothing
                   ]
-                  [ HH.text $ show soughtNumberOfBoats ]
+                  [ HH.text $ show soughtNumberOfLands ]
           in
             Matrix.toColumns regions
               # mapWithIndex renderColumnHeader
@@ -479,17 +479,17 @@ renderBoard { maxWidth, maxHeight } board =
 
     rows = 
       let
-        renderRow index rowRegions =
+        renderRow index rowTerrainTypes =
           let
             rowHeader = 
               let 
                 currentNumberOfUnknowns = 
-                  Util.countIf Region.isUnknown rowRegions
+                  Util.countIf TerrainType.isUnknown rowTerrainTypes
 
                 hasUnknowns = 
                   currentNumberOfUnknowns > 0
 
-                Tuple currentNumberOfBoats soughtNumberOfBoats = 
+                Tuple currentNumberOfLands soughtNumberOfLands = 
                   Array.index progress.rowProgress index
                     # fromMaybe (Tuple 0 0)
                 
@@ -497,7 +497,7 @@ renderBoard { maxWidth, maxHeight } board =
                   Row index 
 
                 finished = 
-                  not hasUnknowns && currentNumberOfBoats == soughtNumberOfBoats
+                  not hasUnknowns && currentNumberOfLands == soughtNumberOfLands
 
                 canFill = 
                   hasUnknowns 
@@ -505,10 +505,10 @@ renderBoard { maxWidth, maxHeight } board =
                     || Board.canFillLine true line board
 
                 tooMany = 
-                  currentNumberOfBoats > soughtNumberOfBoats
+                  currentNumberOfLands > soughtNumberOfLands
 
                 tooFew = 
-                  currentNumberOfBoats + currentNumberOfUnknowns < soughtNumberOfBoats
+                  currentNumberOfLands + currentNumberOfUnknowns < soughtNumberOfLands
               in 
                 HH.div 
                   [ classes 
@@ -537,9 +537,9 @@ renderBoard { maxWidth, maxHeight } board =
                         else 
                           Nothing
                   ]
-                  [ HH.text $ show soughtNumberOfBoats ]
+                  [ HH.text $ show soughtNumberOfLands ]
             
-            renderRegion c region =
+            renderTerrainType c region =
               let
                 position = 
                   Tuple index c
@@ -553,7 +553,7 @@ renderBoard { maxWidth, maxHeight } board =
                           [ "region"
                           , case region of 
                               Unknown -> "unknown"
-                              Boat -> "boat"
+                              Land -> "boat"
                               Water -> "water"
                           , if disabled then "disabled" else ""
                           ]
@@ -587,7 +587,7 @@ renderBoard { maxWidth, maxHeight } board =
                   flexDirection row
               ]
               $ Array.cons rowHeader
-              $ mapWithIndex renderRegion rowRegions
+              $ mapWithIndex renderTerrainType rowTerrainTypes
       in
         Matrix.toRows regions
           # mapWithIndex renderRow
@@ -622,7 +622,7 @@ handleAction =
         H.modify_ 
           \ state -> state { viewPort = viewPort }
     Toggle row col -> 
-      H.modify_ $ updateBoard $ Board.rotateRegion row col
+      H.modify_ $ updateBoard $ Board.rotateTerrainType row col
     Initialize ->
       do
         state <- H.get
@@ -636,7 +636,7 @@ handleAction =
               (Just <<< Resize)
         H.modify_ $ updateBoard (const board)
     ClickedClear -> 
-      H.modify_ $ updateBoard Board.clearEnabledRegions
+      H.modify_ $ updateBoard Board.clearEnabledTerrainTypes
     ClickedHeader line -> 
       H.modify_ $ updateBoard $ Board.fillLine line
     ClickedUndo -> 
