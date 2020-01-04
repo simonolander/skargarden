@@ -4,7 +4,7 @@ import Prelude
 
 import Board (Board, rotateTerrainType)
 import Board as Board
-import CSS (TextDecoration(..), absolute, alignItems, alignSelf, backgroundColor, black, blanchedalmond, border, borderBottom, borderLeft, borderRadius, borderRight, borderTop, bottom, burlywood, color, column, display, dotted, flex, flexDirection, fontFamily, fontSize, height, hover, justifyContent, lineHeight, margin, marginBottom, marginLeft, marginTop, maxHeight, maxWidth, minHeight, minWidth, noneTextDecoration, padding, paddingBottom, paddingLeft, paddingRight, paddingTop, pct, position, pt, px, rgb, ridge, right, row, solid, star, textDecoration, white, whitesmoke, width, with, zIndex, (?))
+import CSS (TextDecoration(..), absolute, alignItems, alignSelf, backgroundColor, black, blanchedalmond, border, borderBottom, borderColor, borderLeft, borderRadius, borderRight, borderTop, bottom, burlywood, color, column, display, dotted, flex, flexDirection, fontFamily, fontSize, height, hover, justifyContent, lineHeight, margin, marginBottom, marginLeft, marginTop, maxHeight, maxWidth, minHeight, minWidth, noneTextDecoration, padding, paddingBottom, paddingLeft, paddingRight, paddingTop, pct, position, pt, px, rgb, ridge, right, row, solid, star, textDecoration, white, whitesmoke, width, with, zIndex, (?))
 import CSS as Grid
 import CSS.Common (center, none)
 import CSS.Flexbox as Flexbox
@@ -36,7 +36,7 @@ import Halogen.HTML.Properties as HP
 import Halogen.HTML.Properties.ARIA (disabled)
 import Halogen.Query.EventSource as ES
 import History as History
-import Matrix (Line(..), Matrix(..))
+import Matrix (Line(..), Matrix(..), east, north, south, west)
 import Matrix as Matrix
 import Progress (Progress)
 import Progress as Progress
@@ -145,18 +145,95 @@ render state =
             width = 
               bounds.maxColumn - bounds.minColumn + 1
 
+            borderStyle =
+              solid
+
+            borderWidth =
+              1.0
+
             islandCell rowIndex columnIndex =
+              let 
+                position =
+                  Tuple rowIndex columnIndex
+
+                hasNorth =
+                  Set.member (north position) region
+
+                hasWest =
+                  Set.member (west position) region
+
+                hasSouth =
+                  Set.member (south position) region
+
+                hasEast =
+                  Set.member (east position) region
+
+                partOfRegion = 
+                  Set.member position region
+
+                borderWidthN =
+                  if rowIndex == 0 then 
+                    px borderWidth
+                  else 
+                    px $ borderWidth / 2.0
+
+                borderWidthW =
+                  if columnIndex == 0 then 
+                    px borderWidth
+                  else 
+                    px $ borderWidth / 2.0
+
+                borderWidthE =
+                  if columnIndex == bounds.maxColumn then 
+                    px borderWidth
+                  else 
+                    px $ borderWidth / 2.0
+
+                borderWidthS =
+                  if rowIndex == bounds.maxRow then 
+                    px borderWidth
+                  else 
+                    px $ borderWidth / 2.0
+
+                backgroundGray = 
+                  rgb 0xe9 0xe9 0xe9
+
+                borderColorN = 
+                  if partOfRegion || hasNorth then 
+                    black
+                  else 
+                    backgroundGray
+
+                borderColorS = 
+                  if partOfRegion || hasSouth then 
+                    black
+                  else 
+                    backgroundGray
+
+                borderColorW = 
+                  if partOfRegion || hasWest then 
+                    black
+                  else 
+                    backgroundGray
+
+                borderColorE = 
+                  if partOfRegion || hasEast then 
+                    black
+                  else 
+                    backgroundGray
+              in
               HH.div 
                 [ CSS.style $ do 
-                    borderRight solid (px 1.0) black
-                    borderBottom solid (px 1.0) black
                     minWidth $ px minSize
                     minHeight $ px minSize
-                    backgroundColor $
-                      if Set.member (Tuple rowIndex columnIndex) region then 
-                        green
-                      else 
-                        blue
+                    borderLeft borderStyle borderWidthW borderColorW
+                    borderTop borderStyle borderWidthN borderColorN
+                    borderRight borderStyle borderWidthE borderColorE
+                    borderBottom borderStyle borderWidthS borderColorS
+                    if not partOfRegion then do 
+                      backgroundColor $ backgroundGray
+                    else 
+                      pure unit
                 ] 
                 []
 
@@ -184,9 +261,6 @@ render state =
                               else 
                                 Nothing
                             ]
-                    , CSS.style $ do 
-                        borderLeft solid (px 1.0) black
-                        borderTop solid (px 1.0) black
                     ]
             
             countView = 

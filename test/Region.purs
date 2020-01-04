@@ -102,3 +102,45 @@ testRotateClockwise =
         r2 = r0
         r3 = r1
     assertRotationEquals r0 r1 r2 r3
+    
+    let r0 = Set.fromFoldable [ Tuple 0 0, Tuple 0 1, Tuple 1 0, Tuple 1 1 ]
+        r1 = r0 
+        r2 = r0
+        r3 = r0
+    assertRotationEquals r0 r1 r2 r3
+    
+    let p0 = Tuple 0 0
+        p1 = Tuple 0 1
+        p2 = Tuple 1 0
+        p3 = Tuple 1 1
+        r0 = Set.fromFoldable [ p0, p1, p2 ]
+        r1 = Set.fromFoldable [ p0, p1, p3 ]
+        r2 = Set.fromFoldable [ p1, p2, p3 ]
+        r3 = Set.fromFoldable [ p0, p2, p3 ]
+    assertRotationEquals r0 r1 r2 r3
+    
+    let p0 = Tuple 1 1
+        p1 = Tuple 1 2
+        p2 = Tuple 2 1
+        p3 = Tuple 2 2
+        r0 = Set.fromFoldable [ p0, p1, p2 ]
+        r1 = Set.fromFoldable [ p0, p1, p3 ]
+        r2 = Set.fromFoldable [ p1, p2, p3 ]
+        r3 = Set.fromFoldable [ p0, p2, p3 ]
+    assertRotationEquals r0 r1 r2 r3
+    
+    let p0 = Tuple 10 10
+        p1 = Tuple 10 11
+        p2 = Tuple 10 12
+        p3 = Tuple 11 10
+        p4 = Tuple 11 11
+        p5 = Tuple 11 12
+        p6 = Tuple 12 10
+        p7 = Tuple 12 11
+        p8 = Tuple 12 12
+        r0 = Set.fromFoldable [ p0, p1, p2, p4 ]
+        r1 = Set.fromFoldable [ p1, p3, p4, p7 ]
+        r2 = Set.fromFoldable [ p1, p3, p4, p5 ]
+        r3 = Set.fromFoldable [ p0, p3, p4, p6 ]
+    assertRotationEquals r0 r1 r2 r3
+    
