@@ -21,20 +21,22 @@ import Matrix (Matrix, Position, Line(..))
 import Matrix as Matrix
 import Progress (Progress)
 import Rectangle as Rectangle
-import Region (Region(..), isBoat)
+import Region (maxColumn)
 import Region as Region
+import TerrainType (TerrainType(..), isLand)
+import TerrainType as TerrainType
 import Util as Util
 
-type Regions = Matrix Region
+type TerrainTypes = Matrix TerrainType
 
 type Board = 
     { boats :: Matrix Boolean
-    , regions :: History Regions
+    , regions :: History TerrainTypes
     , disabled :: Set Position
     }
 
-updateRegions :: (Regions -> Regions) -> Board -> Board
-updateRegions fn board =
+updateTerrainTypes :: (TerrainTypes -> TerrainTypes) -> Board -> Board
+updateTerrainTypes fn board =
     board 
         { regions = 
             History.current board.regions
@@ -65,161 +67,33 @@ initialize board =
         numberOfHints = 
             2 * (numberOfColumns + numberOfRows)
 
-        boatSizes = 
-            [7, 6, 5, 4, 3, 3, 2, 2, 2]
+        numberOfRegions = 
+            (numberOfRows + numberOfColumns) / 2
 
-        getPotentialPositions :: Int -> Effect (Array (Tuple Position Boolean))
-        getPotentialPositions size =
-            do 
-                let
-                    vp :: Array (Tuple Position Boolean)
-                    vp = 
-                        let 
-                            rs = 
-                                Array.range 0 maxRow
-                                    # Array.filter ((<=) 0)
-                            cs = 
-                                Array.range 0 (maxColumn - size + 1) 
-                                    # Array.filter ((<=) 0)
-                        in
-                            Util.pairs rs cs
-                                # map (flip Tuple.Tuple true)
-                    
-                    hp :: Array (Tuple Position Boolean)
-                    hp = 
-                        let 
-                            rs = 
-                                Array.range 0 (maxRow - size + 1)
-                                    # Array.filter ((<=) 0)
-                            cs = 
-                                Array.range 0 maxColumn
-                                    # Array.filter ((<=) 0)
-                        in
-                            Util.pairs rs cs
-                                # map (flip Tuple.Tuple false)
-                Util.shuffle $ Array.concat [vp, hp]
-
-        expandPosition :: Int -> Tuple Position Boolean -> Array Position
-        expandPosition size (Tuple (Tuple rowIndex colIndex) vertical) = 
-            if vertical then 
-                Array.range colIndex (colIndex + size - 1)
-                    # map (flip Tuple.Tuple rowIndex)
-            else 
-                Array.range rowIndex (rowIndex + size - 1)
-                    # map (Tuple.Tuple colIndex)
-
-        isPositionPlacable :: Position -> Matrix Boolean -> Boolean
-        isPositionPlacable position sea =
-            let 
-                center = 
-                    Matrix.get position sea
-                        # Maybe.fromMaybe true
-
-                northWest = 
-                    Matrix.northWest position
-                        # flip Matrix.get sea
-                        # Maybe.fromMaybe false
-
-                north = 
-                    Matrix.north position
-                        # flip Matrix.get sea
-                        # Maybe.fromMaybe false
-
-                northEast = 
-                    Matrix.northEast position
-                        # flip Matrix.get sea
-                        # Maybe.fromMaybe false
-
-                east = 
-                    Matrix.east position
-                        # flip Matrix.get sea
-                        # Maybe.fromMaybe false
-
-                west = 
-                    Matrix.west position
-                        # flip Matrix.get sea
-                        # Maybe.fromMaybe false
-
-                southWest = 
-                    Matrix.southWest position
-                        # flip Matrix.get sea
-                        # Maybe.fromMaybe false
-
-                south = 
-                    Matrix.south position
-                        # flip Matrix.get sea
-                        # Maybe.fromMaybe false
-
-                southEast = 
-                    Matrix.southEast position
-                        # flip Matrix.get sea
-                        # Maybe.fromMaybe false
-            in
-                not $ any identity
-                        [ center
-                        , northWest
-                        , north
-                        , northEast
-                        , west
-                        , east
-                        , southWest
-                        , south
-                        , southEast
-                        ]
-
-        isPlacable :: Array Position -> Matrix Boolean -> Boolean
-        isPlacable positions sea =
-            all (flip isPositionPlacable sea) positions
-
-        placePositions :: Array Position -> Matrix Boolean -> Matrix Boolean
-        placePositions positions sea =
-            Matrix.setMultiple true positions sea
-
-        placeBoatOnPotentialPositions :: Int -> Array (Tuple Position Boolean) -> Matrix Boolean -> Tuple (Matrix Boolean) Boolean
-        placeBoatOnPotentialPositions size potentialPositions sea =
-            case Array.uncons potentialPositions of 
-                Just {head, tail} -> 
-                    let 
-                        positions = 
-                            expandPosition size head
-                    in 
-                        if isPlacable positions sea then 
-                            Tuple.Tuple (placePositions positions sea) true
-                        else 
-                            placeBoatOnPotentialPositions size tail sea
-                Nothing -> 
-                    Tuple.Tuple sea false 
-
-        placeBoat :: Int -> Matrix Boolean -> Effect (Tuple (Matrix Boolean) Boolean)
-        placeBoat size sea =
-            do
-                potentialPositions <- getPotentialPositions size
-                pure $ placeBoatOnPotentialPositions size potentialPositions sea
-
-        placeBoats :: Array Int -> Effect (Matrix Boolean)
-        placeBoats sizes =
-            do
-                let 
-                    sea = Matrix.init numberOfRows numberOfColumns false
-
-                    foldlPlaceBoat :: Matrix Boolean -> Int -> Effect (Matrix Boolean)
-                    foldlPlaceBoat sea size =
-                        do 
-                            result <- placeBoat size sea
-                            if Tuple.snd result then 
-                                pure $ Tuple.fst result
-                            else 
-                                pure sea 
-                foldM foldlPlaceBoat sea sizes
+        numberOfPositions = 
+            (numberOfRows * numberOfColumns) / 3
     in
     do
-        boats <- placeBoats boatSizes
+        regions <- 
+            Region.generateRegions
+                { minRow : 0, minColumn : 0, maxRow, maxColumn }
+                numberOfRegions
+                numberOfPositions
+
+        let 
+            islandPositions = 
+                Set.unions regions
+
+            boats =
+                Matrix.init numberOfRows numberOfColumns false
+                    # mapWithIndex (\ index _ -> Set.member index islandPositions)
+
         hintedIndices <- map Set.fromFoldable $ Util.choose numberOfHints $ Matrix.getIndexes boats
         let 
             hint index boat =
                 if Set.member index hintedIndices then 
                     if boat then 
-                        Boat
+                        Land
                     else 
                         Water
                 else
@@ -235,67 +109,67 @@ getProgress board =
     let 
         rowProgress = 
             Array.zip 
-                (History.current board.regions # Matrix.toRows # map (Util.countIf isBoat))
+                (History.current board.regions # Matrix.toRows # map (Util.countIf isLand))
                 (Matrix.toRows board.boats # map (Util.countIf identity)) 
 
         columnProgress = 
             Array.zip 
-                (History.current board.regions # Matrix.toColumns # map (Util.countIf isBoat))
+                (History.current board.regions # Matrix.toColumns # map (Util.countIf isLand))
                 (Matrix.toColumns board.boats # map (Util.countIf identity)) 
 
-        boatProgress = 
+        islandProgress = 
             let 
-                regionSizes = 
+                currentIslands = 
                     History.current board.regions
-                        # Matrix.findRectangles Region.isBoat
-                        # map Rectangle.size
-                        # map Rectangle.layDown
+                        # Matrix.findRegions TerrainType.isLand
+                        <#> Region.normalize
+                        # Array.fromFoldable
                         # Util.count
                         # Map.fromFoldable
 
-                boatSizes = 
-                    Matrix.findRectangles identity board.boats
-                        # map Rectangle.size
-                        # map Rectangle.layDown
+                sougthIslands = 
+                    Matrix.findRegions identity board.boats
+                        <#> Region.normalize
+                        # Array.fromFoldable
                         # Util.count
                         # Map.fromFoldable
 
                 bothSizes =
-                    Set.union (Map.keys regionSizes) (Map.keys boatSizes)
+                    Set.union (Map.keys currentIslands) (Map.keys sougthIslands)
                         # Array.fromFoldable
-                        # Array.sortWith Rectangle.area
+                        # Array.sortWith Set.size
                         # Array.reverse
                         # map 
                             \ key ->
                                 Tuple key 
                                     $ Tuple 
-                                        (Map.lookup key regionSizes # fromMaybe 0)
-                                        (Map.lookup key boatSizes # fromMaybe 0)
+                                        (Map.lookup key currentIslands # fromMaybe 0)
+                                        (Map.lookup key sougthIslands # fromMaybe 0)
             in 
                 bothSizes
 
-        unknownRegions = 
+        unknownTerrainTypes = 
             History.current board.regions
                 # Matrix.toIndexedArray
                 # map Tuple.snd
-                # Util.countIf Region.isUnknown
+                # Util.countIf TerrainType.isUnknown
     in 
         { rowProgress
         , columnProgress
-        , boatProgress
-        , unknownRegions
+        , islandProgress
+        , unknownTerrainTypes
         }
 
-rotateRegion :: Int -> Int -> Board -> Board
-rotateRegion rowIndex columnIndex board =
-    updateRegions (Matrix.update Region.rotate (Tuple.Tuple rowIndex columnIndex)) board
+rotateTerrainType :: Int -> Int -> Board -> Board
+rotateTerrainType rowIndex columnIndex board =
+    updateTerrainTypes (Matrix.update TerrainType.rotate (Tuple.Tuple rowIndex columnIndex)) board
 
-setUnknownRegions :: Region -> Board -> Board
-setUnknownRegions region board = 
-    updateRegions (map (\ r -> if r == Unknown then region else r)) board
+setUnknownTerrainTypes :: TerrainType -> Board -> Board
+setUnknownTerrainTypes region board = 
+    updateTerrainTypes (map (\ r -> if r == Unknown then region else r)) board
 
-clearEnabledRegions :: Board -> Board
-clearEnabledRegions board = 
+clearEnabledTerrainTypes :: Board -> Board
+clearEnabledTerrainTypes board = 
     let update =
             mapWithIndex
                 \ position region -> 
@@ -304,38 +178,38 @@ clearEnabledRegions board =
                     else 
                         Unknown
     in 
-    updateRegions update board
+    updateTerrainTypes update board
 
 canFillLine :: Boolean -> Line -> Board -> Boolean
 canFillLine fillWater line {boats, regions} =
     fromMaybe false $ do 
-        nBoats <- 
+        nLands <- 
             Matrix.getLine line boats
                 # map (Util.countIf $ if fillWater then identity else not)
         regionLine <- Matrix.getLine line $ History.current regions
         let 
-            nRegions =
-                Util.countIf (if fillWater then Region.isBoat else Region.isWater) regionLine
+            nTerrainTypes =
+                Util.countIf (if fillWater then TerrainType.isLand else TerrainType.isWater) regionLine
             hasUnknowns =
-                Array.any Region.isUnknown regionLine
-        pure $ nBoats == nRegions && hasUnknowns
+                Array.any TerrainType.isUnknown regionLine
+        pure $ nLands == nTerrainTypes && hasUnknowns
 
 fillLine :: Line -> Board -> Board
 fillLine line board =
     if canFillLine false line board then 
         let update = 
                 Matrix.updateLine 
-                    (\ region -> if Region.isUnknown region then Boat else region)
+                    (\ region -> if TerrainType.isUnknown region then Land else region)
                     line
         in 
-            updateRegions update board
+            updateTerrainTypes update board
     else if canFillLine true line board then 
         let update =
                 Matrix.updateLine 
-                    (\ region -> if Region.isUnknown region then Water else region)
+                    (\ region -> if TerrainType.isUnknown region then Water else region)
                     line
         in
-            updateRegions update board
+            updateTerrainTypes update board
     else 
         board
 

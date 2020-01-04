@@ -2,14 +2,19 @@ module Util where
 
 import Prelude
 
-import Control.Monad.List.Trans (foldl)
 import Data.Array as Array
+import Data.Maybe (Maybe)
 import Data.Tuple (Tuple(..))
 import Data.Tuple as Tuple
 import Data.Unfoldable (replicateA)
 import Effect (Effect)
 import Effect.Random (random)
+import Effect.Random as Random
 
+chooseOne :: forall a. Array a -> Effect (Maybe a)
+chooseOne array =
+    Random.randomInt 0 (Array.length array - 1)
+        <#> Array.index array
 
 choose :: forall a. Int -> Array a -> Effect (Array a)
 choose k array =

@@ -2,15 +2,16 @@ module Hello where
 
 import Prelude
 
-import Board (Board, rotateRegion)
+import Board (Board, rotateTerrainType)
 import Board as Board
-import CSS (TextDecoration(..), absolute, alignItems, alignSelf, backgroundColor, black, blanchedalmond, border, borderBottom, borderLeft, borderRadius, borderRight, borderTop, bottom, burlywood, color, column, display, dotted, flex, flexDirection, fontFamily, fontSize, height, hover, justifyContent, lineHeight, margin, marginBottom, marginLeft, marginTop, maxHeight, maxWidth, minHeight, minWidth, noneTextDecoration, padding, paddingBottom, paddingLeft, paddingRight, paddingTop, pct, position, pt, px, rgb, ridge, right, row, solid, star, textDecoration, white, whitesmoke, width, with, zIndex, (?))
+import CSS (TextDecoration(..), absolute, alignItems, alignSelf, backgroundColor, black, blanchedalmond, border, borderBottom, borderColor, borderLeft, borderRadius, borderRight, borderTop, bottom, burlywood, color, column, display, dotted, flex, flexDirection, fontFamily, fontSize, height, hover, justifyContent, lineHeight, margin, marginBottom, marginLeft, marginTop, maxHeight, maxWidth, minHeight, minWidth, noneTextDecoration, padding, paddingBottom, paddingLeft, paddingRight, paddingTop, pct, position, pt, px, rgb, ridge, right, row, solid, star, textDecoration, white, whitesmoke, width, with, zIndex, (?))
 import CSS as Grid
 import CSS.Common (center, none)
 import CSS.Flexbox as Flexbox
 import CSS.Overflow (overflow, overflowY, scroll)
 import CSS.TextAlign (textAlign)
 import CSS.TextAlign as TextAlign
+import Color.Scheme.Clrs (blue, green)
 import Data.Array (any)
 import Data.Array as Array
 import Data.Const (Const)
@@ -35,14 +36,15 @@ import Halogen.HTML.Properties as HP
 import Halogen.HTML.Properties.ARIA (disabled)
 import Halogen.Query.EventSource as ES
 import History as History
-import Matrix (Line(..), Matrix(..))
+import Matrix (Line(..), Matrix(..), east, north, south, west)
 import Matrix as Matrix
 import Progress (Progress)
 import Progress as Progress
 import Rectangle (Rectangle)
 import Rectangle as Rectangle
-import Region (Region(..))
 import Region as Region
+import TerrainType (TerrainType(..))
+import TerrainType as TerrainType
 import Util as Util
 import Version as Version
 import ViewPort (ViewPort)
@@ -120,53 +122,146 @@ render state =
         }
         state.board
 
-    renderBoatLegend :: forall w. Board -> HTML w Action
-    renderBoatLegend board =
+    renderLandLegend :: forall w. Board -> HTML w Action
+    renderLandLegend board =
       let 
-        renderBoatRow (Tuple size (Tuple currentNumberOfBoats soughtNumberOfBoats)) = 
+        renderLandRow (Tuple region (Tuple currentNumberOfLands soughtNumberOfLands)) = 
           let 
             correct = 
-              currentNumberOfBoats == soughtNumberOfBoats
+              currentNumberOfLands == soughtNumberOfLands
 
             tooMany = 
-              currentNumberOfBoats > soughtNumberOfBoats
+              currentNumberOfLands > soughtNumberOfLands
 
             minSize = 
               20.0
+
+            bounds = 
+              Region.getBounds region
+
+            height =
+              bounds.maxRow - bounds.minRow + 1
+
+            width = 
+              bounds.maxColumn - bounds.minColumn + 1
+
+            borderStyle =
+              solid
+
+            borderWidth =
+              1.0
+
+            islandCell rowIndex columnIndex =
+              let 
+                position =
+                  Tuple rowIndex columnIndex
+
+                hasNorth =
+                  Set.member (north position) region
+
+                hasWest =
+                  Set.member (west position) region
+
+                hasSouth =
+                  Set.member (south position) region
+
+                hasEast =
+                  Set.member (east position) region
+
+                partOfRegion = 
+                  Set.member position region
+
+                borderWidthN =
+                  if rowIndex == 0 then 
+                    px borderWidth
+                  else 
+                    px $ borderWidth / 2.0
+
+                borderWidthW =
+                  if columnIndex == 0 then 
+                    px borderWidth
+                  else 
+                    px $ borderWidth / 2.0
+
+                borderWidthE =
+                  if columnIndex == bounds.maxColumn then 
+                    px borderWidth
+                  else 
+                    px $ borderWidth / 2.0
+
+                borderWidthS =
+                  if rowIndex == bounds.maxRow then 
+                    px borderWidth
+                  else 
+                    px $ borderWidth / 2.0
+
+                backgroundGray = 
+                  rgb 0xe9 0xe9 0xe9
+
+                borderColorN = 
+                  if partOfRegion || hasNorth then 
+                    black
+                  else 
+                    backgroundGray
+
+                borderColorS = 
+                  if partOfRegion || hasSouth then 
+                    black
+                  else 
+                    backgroundGray
+
+                borderColorW = 
+                  if partOfRegion || hasWest then 
+                    black
+                  else 
+                    backgroundGray
+
+                borderColorE = 
+                  if partOfRegion || hasEast then 
+                    black
+                  else 
+                    backgroundGray
+              in
+              HH.div 
+                [ CSS.style $ do 
+                    minWidth $ px minSize
+                    minHeight $ px minSize
+                    borderLeft borderStyle borderWidthW borderColorW
+                    borderTop borderStyle borderWidthN borderColorN
+                    borderRight borderStyle borderWidthE borderColorE
+                    borderBottom borderStyle borderWidthS borderColorS
+                    if not partOfRegion then do 
+                      backgroundColor $ backgroundGray
+                    else 
+                      pure unit
+                ] 
+                []
+
+            islandRow rowIndex =
+              Array.range bounds.minColumn bounds.maxColumn
+                <#> islandCell rowIndex
+                # HH.div
+                    [ CSS.style $ do 
+                        display flex
+                        flexDirection row
+                    ]
             
             boatView = 
-              HH.div 
-                [ classes
-                    $ map ClassName
-                    $ Array.catMaybes
-                        [ Just "small-boat"
-                        , if correct then 
-                            Just "correct" 
-                          else if tooMany then 
-                            Just "too-many" 
-                          else 
-                            Nothing
-                        ]
-                , CSS.style $ do 
-                    borderLeft solid (px 1.0) black
-                    borderTop solid (px 1.0) black
-                ]
-                ( Array.replicate size.height
-                    $ HH.div 
-                        [ CSS.style $ do 
-                            display flex
-                            flexDirection row
-                        ]
-                    $ Array.replicate size.width
-                    $ HH.div 
-                      [ CSS.style $ do 
-                          borderRight solid (px 1.0) black
-                          borderBottom solid (px 1.0) black
-                          minWidth $ px minSize
-                          minHeight $ px minSize
-                      ] 
-                      []
-                )
+              Array.range bounds.minRow bounds.maxRow
+                <#> islandRow
+                # HH.div 
+                    [ classes
+                        $ map ClassName
+                        $ Array.catMaybes
+                            [ Just "small-boat"
+                            , if correct then 
+                                Just "correct" 
+                              else if tooMany then 
+                                Just "too-many" 
+                              else 
+                                Nothing
+                            ]
+                    ]
             
             countView = 
               HH.div 
@@ -184,17 +279,17 @@ render state =
                 , CSS.style do 
                     marginLeft $ px $ spacing * 2.0
                     marginLeft $ px $ spacing / 2.0
-                    lineHeight $ px $ Int.toNumber size.height * minSize
+                    lineHeight $ px $ Int.toNumber height * minSize
                 ]
                 [ HH.span 
                     []
-                    [ HH.text $ show currentNumberOfBoats ]
+                    [ HH.text $ show currentNumberOfLands ]
                 , HH.span 
                     []
                     [ HH.text $ "/" ]
                 , HH.span 
                     []
-                    [ HH.text $ show soughtNumberOfBoats ]
+                    [ HH.text $ show soughtNumberOfLands ]
                 ]
           in
             HH.div
@@ -207,7 +302,7 @@ render state =
               [ boatView, countView ]
           
       in 
-        map renderBoatRow progress.boatProgress
+        map renderLandRow progress.islandProgress
           # HH.div
               [ class_ $ ClassName "boat-legend"
               , CSS.style $ do 
@@ -226,7 +321,7 @@ render state =
               ]
 
     boatLegentView = 
-      renderBoatLegend state.board
+      renderLandLegend state.board
 
     buttons =
       let 
@@ -407,15 +502,15 @@ renderBoard { maxWidth, maxHeight } board =
         
         columnHeaders = 
           let
-            renderColumnHeader index columnRegions = 
+            renderColumnHeader index columnTerrainTypes = 
               let 
                 currentNumberOfUnknowns =
-                  Util.countIf Region.isUnknown columnRegions
+                  Util.countIf TerrainType.isUnknown columnTerrainTypes
 
                 hasUnknowns = 
                   currentNumberOfUnknowns > 0
 
-                Tuple currentNumberOfBoats soughtNumberOfBoats = 
+                Tuple currentNumberOfLands soughtNumberOfLands = 
                   Array.index progress.columnProgress index
                     # fromMaybe (Tuple 0 0)
                 
@@ -423,7 +518,7 @@ renderBoard { maxWidth, maxHeight } board =
                   Column index
 
                 finished = 
-                  not hasUnknowns && currentNumberOfBoats == soughtNumberOfBoats
+                  not hasUnknowns && currentNumberOfLands == soughtNumberOfLands
 
                 canFill = 
                   hasUnknowns 
@@ -431,10 +526,10 @@ renderBoard { maxWidth, maxHeight } board =
                     || Board.canFillLine true line board
 
                 tooMany = 
-                  currentNumberOfBoats > soughtNumberOfBoats
+                  currentNumberOfLands > soughtNumberOfLands
 
                 tooFew = 
-                  currentNumberOfUnknowns + currentNumberOfBoats < soughtNumberOfBoats
+                  currentNumberOfUnknowns + currentNumberOfLands < soughtNumberOfLands
               in 
                 HH.div 
                   [ classes 
@@ -463,7 +558,7 @@ renderBoard { maxWidth, maxHeight } board =
                         else 
                           Nothing
                   ]
-                  [ HH.text $ show soughtNumberOfBoats ]
+                  [ HH.text $ show soughtNumberOfLands ]
           in
             Matrix.toColumns regions
               # mapWithIndex renderColumnHeader
@@ -479,17 +574,17 @@ renderBoard { maxWidth, maxHeight } board =
 
     rows = 
       let
-        renderRow index rowRegions =
+        renderRow index rowTerrainTypes =
           let
             rowHeader = 
               let 
                 currentNumberOfUnknowns = 
-                  Util.countIf Region.isUnknown rowRegions
+                  Util.countIf TerrainType.isUnknown rowTerrainTypes
 
                 hasUnknowns = 
                   currentNumberOfUnknowns > 0
 
-                Tuple currentNumberOfBoats soughtNumberOfBoats = 
+                Tuple currentNumberOfLands soughtNumberOfLands = 
                   Array.index progress.rowProgress index
                     # fromMaybe (Tuple 0 0)
                 
@@ -497,7 +592,7 @@ renderBoard { maxWidth, maxHeight } board =
                   Row index 
 
                 finished = 
-                  not hasUnknowns && currentNumberOfBoats == soughtNumberOfBoats
+                  not hasUnknowns && currentNumberOfLands == soughtNumberOfLands
 
                 canFill = 
                   hasUnknowns 
@@ -505,10 +600,10 @@ renderBoard { maxWidth, maxHeight } board =
                     || Board.canFillLine true line board
 
                 tooMany = 
-                  currentNumberOfBoats > soughtNumberOfBoats
+                  currentNumberOfLands > soughtNumberOfLands
 
                 tooFew = 
-                  currentNumberOfBoats + currentNumberOfUnknowns < soughtNumberOfBoats
+                  currentNumberOfLands + currentNumberOfUnknowns < soughtNumberOfLands
               in 
                 HH.div 
                   [ classes 
@@ -537,9 +632,9 @@ renderBoard { maxWidth, maxHeight } board =
                         else 
                           Nothing
                   ]
-                  [ HH.text $ show soughtNumberOfBoats ]
+                  [ HH.text $ show soughtNumberOfLands ]
             
-            renderRegion c region =
+            renderTerrainType c region =
               let
                 position = 
                   Tuple index c
@@ -553,7 +648,7 @@ renderBoard { maxWidth, maxHeight } board =
                           [ "region"
                           , case region of 
                               Unknown -> "unknown"
-                              Boat -> "boat"
+                              Land -> "boat"
                               Water -> "water"
                           , if disabled then "disabled" else ""
                           ]
@@ -587,7 +682,7 @@ renderBoard { maxWidth, maxHeight } board =
                   flexDirection row
               ]
               $ Array.cons rowHeader
-              $ mapWithIndex renderRegion rowRegions
+              $ mapWithIndex renderTerrainType rowTerrainTypes
       in
         Matrix.toRows regions
           # mapWithIndex renderRow
@@ -622,7 +717,7 @@ handleAction =
         H.modify_ 
           \ state -> state { viewPort = viewPort }
     Toggle row col -> 
-      H.modify_ $ updateBoard $ Board.rotateRegion row col
+      H.modify_ $ updateBoard $ Board.rotateTerrainType row col
     Initialize ->
       do
         state <- H.get
@@ -636,7 +731,7 @@ handleAction =
               (Just <<< Resize)
         H.modify_ $ updateBoard (const board)
     ClickedClear -> 
-      H.modify_ $ updateBoard Board.clearEnabledRegions
+      H.modify_ $ updateBoard Board.clearEnabledTerrainTypes
     ClickedHeader line -> 
       H.modify_ $ updateBoard $ Board.fillLine line
     ClickedUndo -> 
