@@ -6,6 +6,8 @@ module Test.Main where
 import Prelude
 
 import Effect (Effect)
+import Test.Region as Test.Region
 
 main :: Effect Unit
-main = pure unit 
+main = do
+    Test.Region.main

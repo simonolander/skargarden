@@ -245,11 +245,11 @@ findRectangles fn matrix =
         findRectangles' (Tuple [] (init numberOfRows numberOfColumns false)) (Tuple 0 0) 
             # Tuple.fst
 
-findTerrainTypes :: forall a. (a -> Boolean) -> Matrix a -> List (Set Position)
-findTerrainTypes fn matrix =
+findRegions :: forall a. (a -> Boolean) -> Matrix a -> List (Set Position)
+findRegions fn matrix =
     let
-        findTerrainType :: Set Position -> Set Position -> Set Position -> Set Position
-        findTerrainType includedPositions queue candidatePositions = 
+        findRegion :: Set Position -> Set Position -> Set Position -> Set Position
+        findRegion includedPositions queue candidatePositions = 
             case Set.findMin queue of 
                 Just position -> 
                     let
@@ -267,22 +267,22 @@ findTerrainTypes fn matrix =
                         includedPositions' = 
                             Set.insert position includedPositions
                     in
-                        findTerrainType includedPositions' queue' candidatePositions
+                        findRegion includedPositions' queue' candidatePositions
                 Nothing -> 
                     includedPositions
 
-        findTerrainTypesR :: Set Position -> List (Set Position)
-        findTerrainTypesR candidatePositions = 
+        findRegionsR :: Set Position -> List (Set Position)
+        findRegionsR candidatePositions = 
             case Set.findMin candidatePositions of 
                 Just candidatePosition -> 
                     let 
                         region = 
-                            findTerrainType Set.empty (Set.singleton candidatePosition) candidatePositions
+                            findRegion Set.empty (Set.singleton candidatePosition) candidatePositions
 
                         candidatePositions' = 
                             Set.difference candidatePositions region
                     in 
-                        region : findTerrainTypesR candidatePositions'
+                        region : findRegionsR candidatePositions'
 
                 Nothing -> 
                     Nil
@@ -292,4 +292,4 @@ findTerrainTypes fn matrix =
             # Array.filter (Tuple.snd >>> fn)
             # map Tuple.fst
             # Set.fromFoldable
-            # findTerrainTypesR
+            # findRegionsR

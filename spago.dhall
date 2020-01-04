@@ -11,6 +11,7 @@ You can edit this file as you like.
     , "psci-support" 
     , "random" 
     , "ordered-collections"
+    , "assert"
     ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]

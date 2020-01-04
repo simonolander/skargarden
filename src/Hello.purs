@@ -11,6 +11,7 @@ import CSS.Flexbox as Flexbox
 import CSS.Overflow (overflow, overflowY, scroll)
 import CSS.TextAlign (textAlign)
 import CSS.TextAlign as TextAlign
+import Color.Scheme.Clrs (blue, green)
 import Data.Array (any)
 import Data.Array as Array
 import Data.Const (Const)
@@ -41,6 +42,7 @@ import Progress (Progress)
 import Progress as Progress
 import Rectangle (Rectangle)
 import Rectangle as Rectangle
+import Region as Region
 import TerrainType (TerrainType(..))
 import TerrainType as TerrainType
 import Util as Util
@@ -123,7 +125,7 @@ render state =
     renderLandLegend :: forall w. Board -> HTML w Action
     renderLandLegend board =
       let 
-        renderLandRow (Tuple size (Tuple currentNumberOfLands soughtNumberOfLands)) = 
+        renderLandRow (Tuple region (Tuple currentNumberOfLands soughtNumberOfLands)) = 
           let 
             correct = 
               currentNumberOfLands == soughtNumberOfLands
@@ -133,40 +135,59 @@ render state =
 
             minSize = 
               20.0
+
+            bounds = 
+              Region.getBounds region
+
+            height =
+              bounds.maxRow - bounds.minRow + 1
+
+            width = 
+              bounds.maxColumn - bounds.minColumn + 1
+
+            islandCell rowIndex columnIndex =
+              HH.div 
+                [ CSS.style $ do 
+                    borderRight solid (px 1.0) black
+                    borderBottom solid (px 1.0) black
+                    minWidth $ px minSize
+                    minHeight $ px minSize
+                    backgroundColor $
+                      if Set.member (Tuple rowIndex columnIndex) region then 
+                        green
+                      else 
+                        blue
+                ] 
+                []
+
+            islandRow rowIndex =
+              Array.range bounds.minColumn bounds.maxColumn
+                <#> islandCell rowIndex
+                # HH.div
+                    [ CSS.style $ do 
+                        display flex
+                        flexDirection row
+                    ]
             
             boatView = 
-              HH.div 
-                [ classes
-                    $ map ClassName
-                    $ Array.catMaybes
-                        [ Just "small-boat"
-                        , if correct then 
-                            Just "correct" 
-                          else if tooMany then 
-                            Just "too-many" 
-                          else 
-                            Nothing
-                        ]
-                , CSS.style $ do 
-                    borderLeft solid (px 1.0) black
-                    borderTop solid (px 1.0) black
-                ]
-                ( Array.replicate size.height
-                    $ HH.div 
-                        [ CSS.style $ do 
-                            display flex
-                            flexDirection row
-                        ]
-                    $ Array.replicate size.width
-                    $ HH.div 
-                      [ CSS.style $ do 
-                          borderRight solid (px 1.0) black
-                          borderBottom solid (px 1.0) black
-                          minWidth $ px minSize
-                          minHeight $ px minSize
-                      ] 
-                      []
-                )
+              Array.range bounds.minRow bounds.maxRow
+                <#> islandRow
+                # HH.div 
+                    [ classes
+                        $ map ClassName
+                        $ Array.catMaybes
+                            [ Just "small-boat"
+                            , if correct then 
+                                Just "correct" 
+                              else if tooMany then 
+                                Just "too-many" 
+                              else 
+                                Nothing
+                            ]
+                    , CSS.style $ do 
+                        borderLeft solid (px 1.0) black
+                        borderTop solid (px 1.0) black
+                    ]
             
             countView = 
               HH.div 
@@ -184,7 +205,7 @@ render state =
                 , CSS.style do 
                     marginLeft $ px $ spacing * 2.0
                     marginLeft $ px $ spacing / 2.0
-                    lineHeight $ px $ Int.toNumber size.height * minSize
+                    lineHeight $ px $ Int.toNumber height * minSize
                 ]
                 [ HH.span 
                     []
@@ -207,7 +228,7 @@ render state =
               [ boatView, countView ]
           
       in 
-        map renderLandRow progress.boatProgress
+        map renderLandRow progress.islandProgress
           # HH.div
               [ class_ $ ClassName "boat-legend"
               , CSS.style $ do 

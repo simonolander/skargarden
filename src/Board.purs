@@ -65,10 +65,10 @@ initialize board =
         maxColumn = numberOfColumns - 1
 
         numberOfHints = 
-            2000 * (numberOfColumns + numberOfRows)
+            2 * (numberOfColumns + numberOfRows)
 
         numberOfRegions = 
-            (numberOfRows + numberOfColumns) / 5
+            (numberOfRows + numberOfColumns) / 2
 
         numberOfPositions = 
             (numberOfRows * numberOfColumns) / 3
@@ -117,34 +117,34 @@ getProgress board =
                 (History.current board.regions # Matrix.toColumns # map (Util.countIf isLand))
                 (Matrix.toColumns board.boats # map (Util.countIf identity)) 
 
-        boatProgress = 
+        islandProgress = 
             let 
-                regionSizes = 
+                currentIslands = 
                     History.current board.regions
-                        # Matrix.findRectangles TerrainType.isLand
-                        # map Rectangle.size
-                        # map Rectangle.layDown
+                        # Matrix.findRegions TerrainType.isLand
+                        <#> Region.normalize
+                        # Array.fromFoldable
                         # Util.count
                         # Map.fromFoldable
 
-                boatSizes = 
-                    Matrix.findRectangles identity board.boats
-                        # map Rectangle.size
-                        # map Rectangle.layDown
+                sougthIslands = 
+                    Matrix.findRegions identity board.boats
+                        <#> Region.normalize
+                        # Array.fromFoldable
                         # Util.count
                         # Map.fromFoldable
 
                 bothSizes =
-                    Set.union (Map.keys regionSizes) (Map.keys boatSizes)
+                    Set.union (Map.keys currentIslands) (Map.keys sougthIslands)
                         # Array.fromFoldable
-                        # Array.sortWith Rectangle.area
+                        # Array.sortWith Set.size
                         # Array.reverse
                         # map 
                             \ key ->
                                 Tuple key 
                                     $ Tuple 
-                                        (Map.lookup key regionSizes # fromMaybe 0)
-                                        (Map.lookup key boatSizes # fromMaybe 0)
+                                        (Map.lookup key currentIslands # fromMaybe 0)
+                                        (Map.lookup key sougthIslands # fromMaybe 0)
             in 
                 bothSizes
 
@@ -156,7 +156,7 @@ getProgress board =
     in 
         { rowProgress
         , columnProgress
-        , boatProgress
+        , islandProgress
         , unknownTerrainTypes
         }
 

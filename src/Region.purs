@@ -3,7 +3,9 @@ module Region where
 import Prelude
 
 import Array.Extra as Array.Extra
+import Array.NonEmpty.Extra as Array.NonEmpty.Extra
 import Data.Array as Array
+import Data.Array.NonEmpty as Array.NonEmpty
 import Data.Bifunctor (bimap, rmap)
 import Data.Bitraversable (bisequence)
 import Data.Foldable (sum)
@@ -87,14 +89,14 @@ rotateClockwise region =
 
         rotatedBounds =
             bounds 
-                { maxRow = bounds.maxRow
+                { maxRow = bounds.maxColumn
                 , maxColumn = bounds.maxRow
                 }
 
         move (Tuple row column) =
             Tuple 
                 (rotatedBounds.minRow + column - bounds.minColumn)
-                (rotatedBounds.minColumn + row - bounds.minRow)
+                (rotatedBounds.maxColumn - row + bounds.minRow)
     in 
         Set.map move region
             
@@ -215,48 +217,91 @@ generateRegions bounds numberOfRegions numberOfPositions =
                 <#> bimap Just Set.NonEmpty.fromFoldable
                 # Array.mapMaybe bisequence
 
-        expandRegions :: Array Region -> Effect (Array Region)
+        expandRegions :: 
+            Array 
+                { index :: Int
+                , included :: Region
+                , expandable :: Region
+                , adjacent :: Region 
+                } -> 
+            Effect 
+                ( Array 
+                    { index :: Int
+                    , included :: Region
+                    , expandable :: Region
+                    , adjacent :: Region
+                    }
+                )
         expandRegions regions =
             let 
                 currentNumberOfPositions = 
-                    map Set.size regions
-                        # sum
-            in 
-                if currentNumberOfPositions >= numberOfPositions then 
+                    sum $ map (_.included >>> Set.size) regions
+            in
+                if currentNumberOfPositions >= numberOfPositions then
                     pure regions
-                else 
-                    do
-                        shuffledRegions :: Array (Tuple Int (Tuple Region (NonEmptySet Position))) <- 
-                            Array.mapWithIndex Tuple regions
-                                <#> rmap (getRegionExpansionsForRegion regions)
-                                <#> rmap (bimap Just Set.NonEmpty.fromFoldable)
-                                <#> bimap Just bisequence
-                                # Array.mapMaybe bisequence
-                                # Random.Extra.shuffle
+                else do 
+                    maybeRegion <- 
+                        Array.Extra.chooseOne $ Array.mapMaybe
+                            ( \ { index, included, expandable, adjacent } -> 
+                                case Array.NonEmpty.fromFoldable expandable of 
+                                    Just nonEmptyExpandable -> 
+                                        Just { index, included, expandable : nonEmptyExpandable, adjacent }
 
-                        case Array.head shuffledRegions of 
-                            Just (Tuple index (Tuple region positions)) ->
-                                do 
-                                    position <- 
-                                        Random.Extra.chooseNonEmpty positions 
-                                    let region' = Set.insert position region
-                                    expandRegions $ Array.Extra.updateAt_ index region' regions
-                            Nothing -> 
-                                pure regions
+                                    Nothing -> 
+                                        Nothing
+                            )
+                            regions
+                    case maybeRegion of 
+                        Just { index, included, expandable, adjacent } -> do 
+                            position <- Array.NonEmpty.Extra.chooseOne expandable
+                            let 
+                                otherRegions =
+                                    Array.filter (_.index >>> (/=) index) regions
+                                
+                                adjacentToPosition = 
+                                    getAdjacentPositions position
+
+                                unexpandableRegions = 
+                                    Set.unions $ map _.adjacent otherRegions
+                                
+                                expandablePositions = 
+                                    Set.difference (getExpandablePositions position) unexpandableRegions
+
+                                updateRegion region =
+                                    if region.index == index then 
+                                        region
+                                            { included = Set.insert position region.included
+                                            , expandable = 
+                                                Set.union expandablePositions region.expandable
+                                                    # Set.delete position
+                                            , adjacent = Set.union adjacentToPosition region.adjacent 
+                                            }
+                                    else 
+                                        region 
+                                            { expandable = Set.difference region.expandable adjacentToPosition }
+                            
+                            expandRegions $ map updateRegion regions
+                        Nothing ->
+                            pure regions
     in do
         startPositions :: Set Position <- 
             Array.fromFoldable positionsInBounds
                 # Util.shuffle 
                 <#> List.fromFoldable
                 <#> selectStartPositions Set.empty Set.empty
-
-        log $ "startPositions: " <> show startPositions
-
         let 
-            startRegions :: Array Region
+            startRegions :: Array { index :: Int, included :: Region, expandable :: Region, adjacent :: Region }
             startRegions = 
-                Set.map Set.singleton startPositions
-                    # Array.fromFoldable
+                Array.fromFoldable startPositions
+                    # Array.mapWithIndex  
+                        ( \ index startPosition -> 
+                                { index
+                                , included : Set.empty
+                                , expandable : Set.singleton startPosition
+                                , adjacent : Set.empty
+                                }
+                        )
 
         expandRegions startRegions
+            <#> map _.included
             <#> List.fromFoldable
