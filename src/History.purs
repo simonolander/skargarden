@@ -15,6 +15,18 @@ data History a =
         , future :: List a
         }
 
+derive instance eqHistory :: Eq a => Eq (History a)
+derive instance ordHistory :: Ord a => Ord (History a)
+instance showHistory :: Show a => Show (History a) where
+    show (History history) = 
+        "{ past : " 
+            <> show history.past 
+            <> ", current : " 
+            <> show history.current 
+            <> ", future : " 
+            <> show history.future
+            <> " }"
+
 back :: forall a. History a -> History a
 back (History h) =
     case List.uncons h.past of 
@@ -35,10 +47,10 @@ current :: forall a. History a -> a
 current (History { current }) = current
 
 hasPast :: forall a. History a -> Boolean
-hasPast (History { past }) = List.null past
+hasPast (History { past }) = not $ List.null past
 
 hasFuture :: forall a. History a -> Boolean
-hasFuture (History { future }) = List.null future
+hasFuture (History { future }) = not $ List.null future
 
 singleton :: forall a. a -> History a
 singleton current = 

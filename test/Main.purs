@@ -6,8 +6,10 @@ module Test.Main where
 import Prelude
 
 import Effect (Effect)
+import Test.History as Test.History
 import Test.Region as Test.Region
 
 main :: Effect Unit
 main = do
     Test.Region.main
+    Test.History.main

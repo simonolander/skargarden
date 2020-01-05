@@ -216,3 +216,7 @@ fillLine line board =
 undo :: Board -> Board
 undo board =
     board { regions = History.back board.regions }
+
+redo :: Board -> Board
+redo board =
+    board { regions = History.forward board.regions }

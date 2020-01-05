@@ -78,6 +78,7 @@ data Action
   | ClickedClear
   | ClickedHeader Line
   | ClickedUndo
+  | ClickedRedo
 
 component :: H.Component HH.HTML Query Input Message Aff
 component =
@@ -356,14 +357,24 @@ render state =
           HH.button
             [ buttonStyle
             , HE.onClick $ const $ Just ClickedUndo
+            , HP.disabled $ History.hasPast state.board.regions
             ]
             [ HH.text "Undo" ] 
+
+        redoButton =
+          HH.button
+            [ buttonStyle
+            , HE.onClick $ const $ Just ClickedRedo
+            , HP.disabled $ History.hasFuture state.board.regions
+            ]
+            [ HH.text "Redo" ] 
       in
       [ if solved then 
           [ newGameButton ]
         else 
           [ clearButton
           , undoButton
+          , redoButton
           ]
       ]
         # Array.concat
@@ -737,3 +748,5 @@ handleAction =
       H.modify_ $ updateBoard $ Board.fillLine line
     ClickedUndo -> 
       H.modify_ $ updateBoard Board.undo
+    ClickedRedo -> 
+      H.modify_ $ updateBoard Board.redo
