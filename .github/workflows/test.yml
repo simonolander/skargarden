@@ -1,6 +1,6 @@
-name: Build project
+name: Test
 
-on: [push]
+on: [ push ]
 
 jobs:
   build:
@@ -11,4 +11,4 @@ jobs:
       with:
         node-version: '12.x'
     - run: yarn install
-    - run: yarn build
+    - run: yarn test
