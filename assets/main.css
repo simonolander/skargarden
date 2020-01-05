@@ -90,11 +90,18 @@ button {
 }
 
 button {
-    cursor: pointer;
     background-color: whitesmoke;
 }
 
-button:hover {
+button:not(:disabled) {
+    cursor: pointer;
+}
+
+button:disabled {
+    cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
     background-color: hsl(0, 0%, 80%);
 }
 
@@ -102,6 +109,7 @@ button:hover {
     color: #cecece;
     text-decoration: none;
 }
+
 .version:hover {
     text-decoration: underline;
     color: black;
