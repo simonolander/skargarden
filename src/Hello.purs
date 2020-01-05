@@ -4,7 +4,7 @@ import Prelude
 
 import Board (Board, rotateTerrainType)
 import Board as Board
-import CSS (TextDecoration(..), absolute, alignItems, alignSelf, backgroundColor, black, blanchedalmond, border, borderBottom, borderColor, borderLeft, borderRadius, borderRight, borderTop, bottom, burlywood, color, column, display, dotted, flex, flexDirection, fontFamily, fontSize, height, hover, justifyContent, lineHeight, margin, marginBottom, marginLeft, marginTop, maxHeight, maxWidth, minHeight, minWidth, noneTextDecoration, padding, paddingBottom, paddingLeft, paddingRight, paddingTop, pct, position, pt, px, rgb, ridge, right, row, solid, star, textDecoration, white, whitesmoke, width, with, zIndex, (?))
+import CSS (TextDecoration(..), absolute, alignItems, alignSelf, backgroundColor, black, blanchedalmond, border, borderBottom, borderColor, borderLeft, borderRadius, borderRight, borderTop, bottom, burlywood, color, column, columnReverse, display, dotted, flex, flexDirection, fontFamily, fontSize, height, hover, justifyContent, lineHeight, margin, marginBottom, marginLeft, marginTop, maxHeight, maxWidth, minHeight, minWidth, noneTextDecoration, padding, paddingBottom, paddingLeft, paddingRight, paddingTop, pct, position, pt, px, rgb, ridge, right, row, solid, spaceBetween, star, textDecoration, white, whitesmoke, width, with, zIndex, (?))
 import CSS as Grid
 import CSS.Common (center, none)
 import CSS.Flexbox as Flexbox
@@ -418,6 +418,7 @@ render state =
                     marginLeft (px spacing)
                     overflowY scroll
                     maxHeight $ px boardHeight
+                    justifyContent spaceBetween
                   else do 
                     flexDirection row
                     pure unit
