@@ -305,3 +305,4 @@ generateRegions bounds numberOfRegions numberOfPositions =
         expandRegions startRegions
             <#> map _.included
             <#> List.fromFoldable
+            <#> List.filter (Set.size >>> (<) 1)
