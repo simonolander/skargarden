@@ -31,7 +31,7 @@ back :: forall a. History a -> History a
 back (History h) =
     case List.uncons h.past of 
         Just { head, tail } -> 
-            History $ h { past = tail, current = head, future = head : h.future }
+            History $ h { past = tail, current = head, future = h.current : h.future }
         Nothing -> 
             History h
 
@@ -39,7 +39,7 @@ forward :: forall a. History a -> History a
 forward (History h) =
     case List.uncons h.future of 
         Just { head, tail } -> 
-            History $ h { past = head : h.past, current = head, future = tail }
+            History $ h { past = h.current : h.past, current = head, future = tail }
         Nothing -> 
             History h
 

@@ -357,7 +357,7 @@ render state =
           HH.button
             [ buttonStyle
             , HE.onClick $ const $ Just ClickedUndo
-            , HP.disabled $ History.hasPast state.board.regions
+            , HP.disabled $ not $ History.hasPast state.board.regions
             ]
             [ HH.text "Undo" ] 
 
@@ -365,7 +365,7 @@ render state =
           HH.button
             [ buttonStyle
             , HE.onClick $ const $ Just ClickedRedo
-            , HP.disabled $ History.hasFuture state.board.regions
+            , HP.disabled $ not $ History.hasFuture state.board.regions
             ]
             [ HH.text "Redo" ] 
       in
