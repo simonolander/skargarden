@@ -34,7 +34,7 @@ all helper scripts for the project):
 yarn build
 ```
 
-Finally, bundle the javascript code and run a local server (defaults to [port 1234](http://localhost:1234):
+Finally, bundle the javascript code and run a local server (defaults to [port 1234](http://localhost:1234)):
 
 ```sh
 yarn serve
