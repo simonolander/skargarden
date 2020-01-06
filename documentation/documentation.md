@@ -6,8 +6,9 @@ The Swedish state has hired you to chart the archipelage. You contracted people 
 
 ## The chart
 
-When you start a new chart, it will look something like this:
+At the start of the game, you will be given a new chart. It will look like this:
 ![Picture of the initial state of the chart](images/new-game.png "New game")
 
-Your objective is to colour in all the tiles that are white. A finished chart will look something like this:
+Your objective is to colour in all the tiles that are white, using the hints in the headers and the legend. A finished chart will look something like this:
 ![Picture of the finished chart](images/completed-game.png "Finished chart")
+Notice that each number in the headers match the number of land tiles in the respective row/column, and that each island shape in the legend is represented the correct number of times in the chart.
