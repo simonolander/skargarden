@@ -6,11 +6,11 @@
     "postinstall": "spago install",
     "clean": "rm -rf node_modules output .spago dist .cache bundle",
     "build": "spago build",
-    "bundle": "spago bundle-app --main Main --to bundle/app.js && parcel build --no-source-maps assets/index.html assets/main.css",
+    "bundle": "spago bundle-app --main Main --to bundle/app.js && parcel build --no-source-maps assets/index.html assets/main.css assets/favicon.png",
     "test": "spago test",
     "spago-serve": "spago bundle-app --main Main --to bundle/app.js -w",
     "parcel-serve": "parcel serve assets/index.html assets/main.css",
-    "serve": "parallel -- 'yarn run spago bundle-app --main Main --to bundle/app.js -w' 'yarn run parcel serve assets/index.html assets/main.css'",
+    "serve": "parallel -- 'yarn run spago bundle-app --main Main --to bundle/app.js -w' 'yarn run parcel serve assets/index.html assets/main.css assets/favicon.png'",
     "patch": "git tag | sort -rV | head -n1 | awk -F. '{$NF++; OFS=\".\"; print $0}' | xargs -I. git tag -a . -m \"New patch version: .\" && git push && git push --tags"
   },
   "repository": {
