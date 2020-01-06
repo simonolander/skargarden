@@ -80,5 +80,5 @@ A white shape in the legend indicates that you have too few islands with that sh
 
 #### Incorrect shapes
 
-A red shape in the legend indicates that you have too many islands with that shape in your chart. In this image there are 2 incorrect shapes circled in red. From top to bottom, the first incorrect shape has 6 islands but should only have to, and the second has 2 but shouldn't have any at all.
+A red shape in the legend indicates that you have too many islands with that shape in your chart. In this image there are 2 incorrect shapes circled in red. From top to bottom, the first incorrect shape has 6 islands but should only have 2, and the second has 2 but shouldn't have any at all.
 ![Picture of the incorrect legend shapes](images/concepts-legend-incorrect.png "The incorrect shapes circled in red")
