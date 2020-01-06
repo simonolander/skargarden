@@ -6,4 +6,8 @@ The Swedish state has hired you to chart the archipelage. You contracted people 
 
 ## The chart
 
-![alt text](images/completed-game.png "Logo Title Text 1")
+When you start a new chart, it will look something like this:
+![Picture of the initial state of the chart](images/new-game.png "New game")
+
+Your objective is to colour in all the tiles that are white. A finished chart will look something like this:
+![Picture of the finished chart](images/completed-game.png "Finished chart")
