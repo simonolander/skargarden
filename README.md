@@ -10,7 +10,7 @@ The Swedish state has hired you to chart the archipelago. You contracted people 
 
 ## Tutorial
 
-See the [tutorial document](docs/tutorial.md).
+See the [tutorial document](docs/tutorial.md)!
 
 ## Installation
 
