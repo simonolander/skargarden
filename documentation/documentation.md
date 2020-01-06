@@ -46,4 +46,19 @@ There are headers on the top and to the left of the chart. Each header contains 
 - A row header with the number 4, indicating that the row contains 4 land tiles (and 6 water tiles).
 ![Picture of headers with numbers](images/concepts-header-numbers.png "Two headers circled: one column header with 0 land tiles, and one row header with 4 land tiles")
 
+#### Correct headers
+
+If a row or column is correct with respect to the number indicated in its header, the header will be faded out. For example the circled column header and the circled row header are correctly filled with 3 and 5 land tiles respectively.
+
+![Picture of correct headers](images/concepts-header-correct.png "Two correct headers circled: one column header with 3 land tiles, and one row header with 5 land tiles")
+
+#### Incorrect headers
+
+A red header indicates that the row or column contains too many land tiles or too many water tiles. Some of the current water tiles need to be land tiles or vice versa. For example the circled column header and the circled row header are incorrectly filled. The column contains too many land tiles, and the row contains too many water tiles.
+![Picture of incorrect headers](images/concepts-header-incorrect.png "Two incorrect headers circled: one column header with too many land tiles (6 instead of 3), and one row header with too many water tiles (7 instead of 6)")
+
+#### Auto fill
+
+If the blank tiles in a row or column can be deduced to all be land tiles or all be water tiles by only looking at the number in the header, you can auto fill it by clicking the header.
+
 ### Legend
