@@ -61,4 +61,14 @@ A red header indicates that the row or column contains too many land tiles or to
 
 If the blank tiles in a row or column can be deduced to all be land tiles or all be water tiles by only looking at the number in the header, you can auto fill it by clicking the header.
 
-### Legend
+### Island legend
+
+The island legend helps you know the shape and number of islands you need to shart. Each entry in the legend has the form `<island_shape> current_count/correct_count`. Two islands are considered to have the same shape if they can be rotated to look the same. The shape in the legend does not necessarily have the same rotation as the island(s) in the chart. 
+
+Here is the island legend circled in red.
+![Picture of the island legend](images/concepts-legend.png "The island legend circled in red")
+
+#### Correct islands
+
+A brown shape in the legend indicates that you have the correct number of islands with that shape in your chart. For example, in this image the only correct shape (with 1 out of 1 found) is circled in red.
+![Picture of the correct legend shape](images/concepts-legend-correct.png "The correct shape circled in red")
