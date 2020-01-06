@@ -41,4 +41,9 @@ Blank tiles indicate that you don't know yet whether the tile should be land or 
 
 ### Headers
 
+There are headers on the top and to the left of the chart. Each header contains the number of land tiles in its respective row or column. In this image, two headers are circled: 
+- A column header with the number 0, indicating that the column contains 0 land tiles (i.e. only water)
+- A row header with the number 4, indicating that the row contains 4 land tiles (and 6 water tiles).
+![Picture of headers with numbers](images/concepts-header-numbers.png "Two headers circled: one column header with 0 land tiles, and one row header with 4 land tiles")
+
 ### Legend
