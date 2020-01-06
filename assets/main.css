@@ -13,8 +13,12 @@ button {
     font-family: monospace;
 }
 
-.region {
+.region, .header {
+    touch-action: manipulation;
     cursor: pointer;
+}
+
+.region {
     border-right: thin solid whitesmoke;
     border-top: thin solid whitesmoke;
 }
@@ -55,7 +59,6 @@ button {
 }
 
 .header:hover {
-    cursor: pointer;
     background-color: hsl(0, 0%, 80%);
 }
 
@@ -103,6 +106,14 @@ button:disabled {
 
 button:hover:not(:disabled) {
     background-color: hsl(0, 0%, 80%);
+}
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
 }
 
 .version {

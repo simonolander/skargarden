@@ -8,6 +8,8 @@
     "build": "spago build",
     "bundle": "spago bundle-app --main Main --to bundle/app.js && parcel build --no-source-maps assets/index.html assets/main.css",
     "test": "spago test",
+    "spago-serve": "spago bundle-app --main Main --to bundle/app.js -w",
+    "parcel-serve": "parcel serve assets/index.html assets/main.css",
     "serve": "parallel -- 'yarn run spago bundle-app --main Main --to bundle/app.js -w' 'yarn run parcel serve assets/index.html assets/main.css'",
     "patch": "git tag | sort -rV | head -n1 | awk -F. '{$NF++; OFS=\".\"; print $0}' | xargs -I. git tag -a . -m \"New patch version: .\" && git push && git push --tags"
   },

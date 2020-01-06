@@ -2,7 +2,7 @@ module Hello where
 
 import Prelude
 
-import Board (Board, rotateTerrainType)
+import Board (Board)
 import Board as Board
 import CSS (TextDecoration(..), absolute, alignItems, alignSelf, backgroundColor, black, blanchedalmond, border, borderBottom, borderColor, borderLeft, borderRadius, borderRight, borderTop, bottom, burlywood, color, column, columnReverse, display, dotted, flex, flexDirection, fontFamily, fontSize, height, hover, justifyContent, lineHeight, margin, marginBottom, marginLeft, marginTop, maxHeight, maxWidth, minHeight, minWidth, noneTextDecoration, padding, paddingBottom, paddingLeft, paddingRight, paddingTop, pct, position, pt, px, rgb, ridge, right, row, solid, spaceBetween, star, textDecoration, white, whitesmoke, width, with, zIndex, (?))
 import CSS as Grid
@@ -327,7 +327,7 @@ render state =
     buttons =
       let 
         buttonStyle = 
-          CSS.style $ do 
+          do 
             display flex
             padding (px 10.0) (px 10.0) (px 10.0) (px 10.0)
             fontSize $ px 18.0
@@ -341,21 +341,21 @@ render state =
 
         newGameButton = 
           HH.button 
-            [ buttonStyle
+            [ CSS.style buttonStyle
             , HE.onClick $ const $ Just Initialize
             ]
             [ HH.text "New game" ]
 
         clearButton =
           HH.button
-            [ buttonStyle
+            [ CSS.style buttonStyle
             , HE.onClick $ const $ Just ClickedClear
             ]
             [ HH.text "Clear" ] 
 
         undoButton =
           HH.button
-            [ buttonStyle
+            [ CSS.style buttonStyle
             , HE.onClick $ const $ Just ClickedUndo
             , HP.disabled $ not $ History.hasPast state.board.regions
             ]
@@ -363,18 +363,28 @@ render state =
 
         redoButton =
           HH.button
-            [ buttonStyle
+            [ CSS.style buttonStyle
             , HE.onClick $ const $ Just ClickedRedo
             , HP.disabled $ not $ History.hasFuture state.board.regions
             ]
             [ HH.text "Redo" ] 
+        
+        tutorialLink =
+          HH.a
+            [ CSS.style buttonStyle
+            , HP.href "https://github.com/simonolander/skargarden/blob/master/docs/tutorial.md"
+            ]
+            [ HH.text "Tutorial" ]
       in
       [ if solved then 
-          [ newGameButton ]
+          [ newGameButton
+          , tutorialLink
+          ]
         else 
           [ clearButton
           , undoButton
           , redoButton
+          , tutorialLink
           ]
       ]
         # Array.concat
