@@ -68,7 +68,12 @@ The island legend helps you know the shape and number of islands you need to sha
 Here is the island legend circled in red.
 ![Picture of the island legend](images/concepts-legend.png "The island legend circled in red")
 
-#### Correct islands
+#### Correct shapes
 
 A brown shape in the legend indicates that you have the correct number of islands with that shape in your chart. For example, in this image the only correct shape (with 1 out of 1 found) is circled in red.
 ![Picture of the correct legend shape](images/concepts-legend-correct.png "The correct shape circled in red")
+
+#### Incomplete shapes
+
+A white shape in the legend indicates that you have too few islands with that shape in your chart. In this image there are 5 incomplete shapes circled in red. From top to bottom, the 4th incomplete shape has 1 island out of 2 founds, and the rest of the incomplete shapes have 0 out of 1 found.
+![Picture of the incomplete legend shapes](images/concepts-legend-incomplete.png "The incomplete shapes circled in red")
