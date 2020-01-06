@@ -31,7 +31,7 @@ Land tiles join together to form islands. An island is a set of land tiles that 
 
 #### Water tiles
 
-Water tiles separates the islands.
+Water tiles separate the islands.
 ![Picture of water tiles](images/concepts-tile-water.png "Water tiles circled in red")
 
 #### Blank tiles
@@ -82,3 +82,21 @@ A white shape in the legend indicates that you have too few islands with that sh
 
 A red shape in the legend indicates that you have too many islands with that shape in your chart. In this image there are 2 incorrect shapes circled in red. From top to bottom, the first incorrect shape has 6 islands but should only have 2, and the second has 2 but shouldn't have any at all.
 ![Picture of the incorrect legend shapes](images/concepts-legend-incorrect.png "The incorrect shapes circled in red")
+
+## Island positioning
+
+Islands can have any shape, and can be positioned anywhere *as long as no two islands are touching*. In this image, these two islands cannot touch where indicated by the red circle.
+![Picture of the islands incorrectly touching](images/concepts-islands-touching.png "Islands cannot touch where indicated by the red circle")
+
+### Allowed positioning
+
+Two islands must have water between them, like in this image.
+![Picture of islands surrounded by water](images/islands-need-to-have-water.png "There needs to be water in between islands")
+
+This is also okay, since it's the island touching itself.
+![Picture of one island touching itself](images/island-can-touch-self.png "An island can touch itself")
+
+### Disallowed positioning
+
+This is not okay.
+![Picture of islands illegally touching](images/islands-cannot-touch.png "These two islands cannot touch like this")
