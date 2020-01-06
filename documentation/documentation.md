@@ -77,3 +77,8 @@ A brown shape in the legend indicates that you have the correct number of island
 
 A white shape in the legend indicates that you have too few islands with that shape in your chart. In this image there are 5 incomplete shapes circled in red. From top to bottom, the 4th incomplete shape has 1 island out of 2 founds, and the rest of the incomplete shapes have 0 out of 1 found.
 ![Picture of the incomplete legend shapes](images/concepts-legend-incomplete.png "The incomplete shapes circled in red")
+
+#### Incorrect shapes
+
+A red shape in the legend indicates that you have too many islands with that shape in your chart. In this image there are 2 incorrect shapes circled in red. From top to bottom, the first incorrect shape has 6 islands but should only have to, and the second has 2 but shouldn't have any at all.
+![Picture of the incorrect legend shapes](images/concepts-legend-incorrect.png "The incorrect shapes circled in red")
