@@ -135,7 +135,16 @@ render state =
               currentNumberOfLands > soughtNumberOfLands
 
             minSize = 
-              20.0
+              if landscape then
+                if maxBoardWidth < 800.0 then 
+                  (maxBoardWidth / 2.5 - spacing * 3.0 - 10.0) / 10.0 
+                else 
+                  20.0
+              else 
+                if maxBoardWidth < 400.0 then 
+                  (maxBoardWidth / 2.0 - spacing - 10.0) / 10.0
+                else
+                  20.0
 
             bounds = 
               Region.getBounds region
@@ -328,8 +337,12 @@ render state =
       let 
         buttonStyle = 
           do 
+            let 
+              paddingSize = 
+                px 6.0
+
             display flex
-            padding (px 10.0) (px 10.0) (px 10.0) (px 10.0)
+            padding paddingSize paddingSize paddingSize paddingSize
             fontSize $ px 18.0
             justifyContent center
             marginTop $ px spacing
@@ -337,7 +350,7 @@ render state =
             if landscape then do 
               marginTop $ px spacing
             else do 
-              width $ pct 100.0
+              pure unit
 
         newGameButton = 
           HH.button 
@@ -418,6 +431,7 @@ render state =
           padding (px spacing) (px spacing) (px spacing) (px spacing)
           justifyContent center
           alignItems center
+          width $ px $ Int.toNumber state.viewPort.width - spacing * 2.0
           height $ px $ Int.toNumber state.viewPort.height - spacing * 2.0
       ]
       [ versionView
