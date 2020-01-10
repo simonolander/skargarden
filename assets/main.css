@@ -10,6 +10,14 @@ body {
     -ms-user-select: none;
 }
 
+div {
+    scrollbar-width: none;
+}
+
+div::-webkit-scrollbar {
+  display: none;
+}
+
 button {
     font-family: monospace;
 }
