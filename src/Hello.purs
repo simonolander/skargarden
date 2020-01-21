@@ -149,10 +149,10 @@ render state =
             bounds = 
               Region.getBounds region
 
-            height =
+            islandHeight =
               bounds.maxRow - bounds.minRow + 1
 
-            width = 
+            islandWidth =
               bounds.maxColumn - bounds.minColumn + 1
 
             borderStyle =
@@ -234,8 +234,8 @@ render state =
               in
               HH.div 
                 [ CSS.style $ do 
-                    minWidth $ px minSize
-                    minHeight $ px minSize
+                    width $ px minSize
+                    height $ px minSize
                     borderLeft borderStyle borderWidthW borderColorW
                     borderTop borderStyle borderWidthN borderColorN
                     borderRight borderStyle borderWidthE borderColorE
@@ -289,7 +289,7 @@ render state =
                 , CSS.style do 
                     marginLeft $ px $ spacing * 2.0
                     marginLeft $ px $ spacing / 2.0
-                    lineHeight $ px $ Int.toNumber height * minSize
+                    lineHeight $ px $ Int.toNumber islandHeight * minSize
                 ]
                 [ HH.span 
                     []
