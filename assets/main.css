@@ -75,7 +75,7 @@ button {
     color: #e9e9e9;
 }
 
-.header.too-many {
+.header.too-many, .header.too-few {
     color: rgb(209, 0, 0);
     background-color: hsl(0, 50%, 90%);
 }

@@ -653,7 +653,7 @@ renderBoard { maxWidth, maxHeight } board =
                             else if tooMany then 
                               Just "too-many"  
                             else if tooFew then 
-                              Just "too-many"  
+                              Just "too-few"  
                             else 
                               Nothing
                           ]
