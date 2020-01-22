@@ -9,8 +9,8 @@
     "bundle": "spago bundle-app --main Main --to bundle/app.js && parcel build --no-source-maps assets/index.html assets/main.css assets/favicon.ico",
     "test": "spago test",
     "spago-serve": "spago bundle-app --main Main --to bundle/app.js -w",
-    "parcel-serve": "parcel serve assets/index.html assets/main.css",
-    "serve": "parallel -- 'yarn run spago bundle-app --main Main --to bundle/app.js -w' 'yarn run parcel serve assets/index.html assets/main.css assets/favicon.ico'",
+    "parcel-serve": "parcel serve assets/index.html assets/main.css assets/favicon.ico",
+    "serve": "npm-run-all --parallel spago-serve parcel-serve",
     "patch": "git tag | sort -rV | head -n1 | awk -F. '{$NF++; OFS=\".\"; print $0}' | xargs -I. git tag -a . -m \"New patch version: .\" && git push && git push --tags"
   },
   "repository": {
@@ -34,6 +34,7 @@
   "dependencies": {
     "decimal.js": "^10.1.1",
     "http-server": "^0.11.1",
-    "marked": "^0.6.2"
+    "marked": "^0.6.2",
+    "npm-run-all": "^4.1.5"
   }
 }
