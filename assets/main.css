@@ -89,7 +89,7 @@ button {
     border-radius: 5px;
 }
 
-.small-boat {
+/* .small-boat {
     background-color: white;
 }
 
@@ -99,7 +99,7 @@ button {
 
 .small-boat.too-many {
     background-color: hsl(0, 57%, 75%);
-}
+} */
 
 button {
     background-color: whitesmoke;

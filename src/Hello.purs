@@ -240,8 +240,13 @@ render state =
                     borderTop borderStyle borderWidthN borderColorN
                     borderRight borderStyle borderWidthE borderColorE
                     borderBottom borderStyle borderWidthS borderColorS
-                    if not partOfRegion then do 
-                      backgroundColor $ backgroundGray
+                    if partOfRegion then do
+                      if correct then do
+                        backgroundColor $ rgb 228 196 155
+                      else if tooMany then do
+                        backgroundColor $ rgb 228 155 155
+                      else
+                        backgroundColor $ white
                     else 
                       pure unit
                 ] 
@@ -308,6 +313,7 @@ render state =
                   display flex
                   flexDirection row
                   marginBottom $ px $ spacing / 2.0
+                  minHeight $ px $ Int.toNumber islandHeight * minSize + spacing / 2.0
               ]
               [ boatView, countView ]
           
@@ -321,12 +327,11 @@ render state =
                   paddingLeft $ px $ spacing / 2.0
                   paddingTop $ px $ spacing / 2.0
                   paddingRight $ px $ spacing / 2.0
+                  overflowY scroll
                   if landscape then do 
-                    overflowY scroll
                     pure unit
                   else do 
                     maxHeight $ px $ Int.toNumber state.viewPort.height - spacing * 3.0 - boardHeight
-                    overflowY scroll
                     marginTop $ px $ spacing
               ]
 
