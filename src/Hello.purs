@@ -352,6 +352,7 @@ render state =
             justifyContent center
             marginTop $ px spacing
             borderRadius (px 5.0) (px 5.0) (px 5.0) (px 5.0)
+            minHeight $ px 34.5
             if landscape then do 
               marginTop $ px spacing
             else do 
